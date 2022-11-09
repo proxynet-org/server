@@ -1,6 +1,6 @@
 # server
 
-```
+```sh
 # create a virtual environement (recommended)
 virtualenv env
 source env/bin/activate 
