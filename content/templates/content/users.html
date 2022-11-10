@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Test</title>
+</head>
+
+<body>
+    <div class="container">
+        <!-- For each user create a div -->
+        {% for user in users %}
+        <div class="box">
+            <a href="{% url 'user-detail' user.id %}">{{ user.username }}</a>
+        </div>
+        {% endfor %}
+    </div>
+</body>

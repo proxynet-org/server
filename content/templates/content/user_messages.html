@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Test</title>
+</head>
+
+<body>
+
+    {% for message in messages %}
+    <div class="box">
+        <p>{{ message.created_at }} - {{ message.text }}</p>
+    </div>
+    {% endfor %}
+</body>

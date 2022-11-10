@@ -1,6 +1,7 @@
 # path for message viewset
 from django.urls import path
 from .apis import MessageViewSet
+from .views import UserListView, UserDetailView
 
 urlpatterns = [
     path('messages/', MessageViewSet.as_view({
@@ -12,4 +13,6 @@ urlpatterns = [
         'put': 'update',
         'delete': 'destroy'
     }), name='message-detail'),
+    path('users/', UserListView, name='user-list'),
+    path('users/<int:pk>/', UserDetailView, name='user-detail'),
 ]
