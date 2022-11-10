@@ -4,11 +4,11 @@ from .apis import MessageViewSet
 from .views import UserListView, UserDetailView
 
 urlpatterns = [
-    path('messages/', MessageViewSet.as_view({
+    path('api/messages/', MessageViewSet.as_view({
         'get': 'list',
         'post': 'create'
     }), name='message-list'),
-    path('messages/<int:pk>/', MessageViewSet.as_view({
+    path('api/messages/<int:pk>/', MessageViewSet.as_view({
         'get': 'retrieve',
         'put': 'update',
         'delete': 'destroy'
