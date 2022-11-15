@@ -9,6 +9,7 @@
 
     {% for message in messages %}
     <div class="box">
+        <br>
         <p>{{ message.created_at }} - {{ message.text }}</p>
     </div>
     {% endfor %}
