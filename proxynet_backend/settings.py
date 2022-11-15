@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'chartjs',
     'rest_framework_swagger',
+    'django_extensions',
     # apps
     'content',
     'users',
