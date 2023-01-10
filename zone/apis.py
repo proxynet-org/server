@@ -6,6 +6,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from users.models import User
 
-class ZoneViewSet(viewsets.ModelViewset):
+class ZoneViewSet(viewsets.ModelViewSet):
     queryset = Zone.objects.all()
     serializer_class = ZoneSerializer
