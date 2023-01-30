@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-u2!=+r%v$3&&#p7eaya02*$r#xub8#(z46d&y=zpc^h1xk%cd6'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -50,7 +50,15 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'users.User'
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/users/'
+LOGIN_REQUIRED_URLS = (
+    r'(.*)',
+)
+LOGIN_REQUIRED_URLS_EXCEPTIONS = (
+    r'/admin(.*)$',
+    r'/login(.*)$',
+)
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated', ),
@@ -65,6 +73,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # my middlewares
+    'users.middleware.RequireLoginMiddleware',
 ]
 
 ROOT_URLCONF = 'proxynet_backend.urls'
