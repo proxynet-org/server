@@ -62,7 +62,8 @@ def post_message():
         url = reverse('message-list')
         # login the user
         client = APIClient()
-        client.login(username='user{}'.format(i), password='user{}'.format(i))
+        user = User.objects.get(username='user{}'.format(i))
+        client.force_authenticate(user=user)
         for j in range(10):
             client.post(url, {'text': fake.text()})
 
