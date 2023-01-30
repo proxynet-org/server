@@ -2,13 +2,12 @@ from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
 from django.conf.urls import url
-from rest_framework_swagger.views import get_swagger_view
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
-schema_view = get_swagger_view(title='Proxynet API')
 
 urlpatterns = [
     # admin page
@@ -20,7 +19,10 @@ urlpatterns = [
     path('', include('zone.urls')),
 
     # docs
-    url(r'^docs/', schema_view),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    # Optional UI:
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
     # token
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
