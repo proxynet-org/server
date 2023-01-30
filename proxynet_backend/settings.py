@@ -58,7 +58,7 @@ LOGIN_REQUIRED_URLS = (
 )
 LOGIN_REQUIRED_URLS_EXCEPTIONS = (
     r'/admin(.*)$',
-    r'/login(.*)$',
+    r'/api(.*)$',
 )
 
 SIMPLE_JWT = {

@@ -1,4 +1,5 @@
 from django.test import TestCase
+from rest_framework.test import APITestCase
 from users.models import User
 from content.models import Message
 from rest_framework.test import APIClient
@@ -6,7 +7,7 @@ from rest_framework import status
 from django.urls import reverse
 
 
-class TestMessagesFromDistance(TestCase):
+class TestMessagesFromDistance(APITestCase):
     """
     in setup :
     create 3 users
@@ -38,15 +39,15 @@ class TestMessagesFromDistance(TestCase):
 
         # Each user post "Hello World" message
 
-        self.client.login(username='testuser1', password='12345')
+        self.client.force_authenticate(user=self.user1)
         self.client.post(self.url, {'text': 'Hello World, its me testuser1'})
         self.client.logout()
 
-        self.client.login(username='testuser2', password='12345')
+        self.client.force_authenticate(user=self.user2)
         self.client.post(self.url, {'text': 'Hello World, its me testuser2'})
         self.client.logout()
 
-        self.client.login(username='testuser3', password='12345')
+        self.client.force_authenticate(user=self.user3)
         self.client.post(self.url, {'text': 'Hello World, its me testuser3'})
         self.client.logout()
 
@@ -54,7 +55,7 @@ class TestMessagesFromDistance(TestCase):
         """
         testuser1 can see his message and testuser2 message
         """
-        self.client.login(username='testuser1', password='12345')
+        self.client.force_authenticate(user=self.user1)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
@@ -66,7 +67,7 @@ class TestMessagesFromDistance(TestCase):
         """
         same goes for testuser2
         """
-        self.client.login(username='testuser2', password='12345')
+        self.client.force_authenticate(user=self.user2)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
@@ -78,7 +79,7 @@ class TestMessagesFromDistance(TestCase):
         """
         testuser3 can only see his own message
         """
-        self.client.login(username='testuser3', password='12345')
+        self.client.force_authenticate(user=self.user3)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
