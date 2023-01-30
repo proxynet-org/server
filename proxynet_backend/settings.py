@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     # apps
     'content',
     'users',
+    'zone'
 ]
 
 AUTH_USER_MODEL = 'users.User'
