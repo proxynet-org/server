@@ -1,7 +1,10 @@
-from .apis import update_location
 from django.urls import path
-
+from django.contrib.auth.views import LoginView
+from .apis import UserViewSet
 
 urlpatterns = [
-    path('api/users/location/', update_location, name='user-update-location'),
+    path("login/", LoginView.as_view(), name="login"),
+    path('api/users/register/', UserViewSet.as_view({
+        'post': 'create'
+    }), name='user-registration'),
 ]
