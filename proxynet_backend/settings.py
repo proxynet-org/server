@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'chartjs',
     'rest_framework_swagger',
+    'drf_spectacular',
     'django_extensions',
+    'corsheaders',
     # apps
     'content',
     'users',
@@ -59,6 +61,7 @@ LOGIN_REQUIRED_URLS = (
 LOGIN_REQUIRED_URLS_EXCEPTIONS = (
     r'/admin(.*)$',
     r'/api(.*)$',
+    r'/login(.*)$',
 )
 
 SIMPLE_JWT = {
@@ -98,7 +101,15 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Your Project API',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
 }
 
 MIDDLEWARE = [
@@ -111,7 +122,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # my middlewares
     'users.middleware.RequireLoginMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'proxynet_backend.urls'
 
