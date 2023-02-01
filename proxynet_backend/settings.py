@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
     'drf_spectacular',
     'django_extensions',
+    'corsheaders',
     # apps
     'content',
     'users',
@@ -60,6 +61,7 @@ LOGIN_REQUIRED_URLS = (
 LOGIN_REQUIRED_URLS_EXCEPTIONS = (
     r'/admin(.*)$',
     r'/api(.*)$',
+    r'/login(.*)$',
 )
 
 SIMPLE_JWT = {
@@ -120,7 +122,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # my middlewares
     'users.middleware.RequireLoginMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'proxynet_backend.urls'
 
