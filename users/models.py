@@ -8,9 +8,9 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class User(AbstractUser):
-    def _createId():
+    def _createHash():
         return hexlify(os.urandom(16))
-    idUser = models.CharField(max_length=32, primary_key=True, default=_createId)
+    userHash = models.CharField(max_length=32, default=_createHash, unique=True, null=True)
     first_name = models.CharField(_("First name"), max_length=30, blank=False, null=False)
     last_name = models.CharField(_("Last name"), max_length=30, blank=False, null=False)
     email = models.EmailField(_("Email address"), blank=False, null=False)

@@ -3,10 +3,11 @@ from content.models import Message
 from rest_framework.test import APIClient
 from django.urls import reverse
 from django.test import TestCase
+from rest_framework.test import APITestCase
 from rest_framework import status
 
 
-class TestUpdateUserLocation(TestCase):
+class TestUpdateUserLocation(APITestCase):
     def setUp(self):
         self.user_a = User.objects.create_user(
             username='user_a',
@@ -23,10 +24,10 @@ class TestUpdateUserLocation(TestCase):
         )
 
         self.user_a_client = APIClient()
-        self.user_a_client.login(username='user_a', password='user_a')
+        self.user_a_client.force_authenticate(user=self.user_a)
 
         self.user_b_client = APIClient()
-        self.user_b_client.login(username='user_b', password='user_b')
+        self.user_b_client.force_authenticate(user=self.user_b)
 
     def test_update_user_location(self):
         # user_a posts "Hi from Paris" message
@@ -46,7 +47,7 @@ class TestUpdateUserLocation(TestCase):
 
         # user_b moves to paris
 
-        url = reverse('user-update-location')
+        url = reverse('update-user-location')
         data = {
             'location': '48.856614,2.3522219',
         }

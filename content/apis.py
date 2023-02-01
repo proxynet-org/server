@@ -20,7 +20,6 @@ class MessageViewSet(viewsets.ModelViewSet):
         data['user'] = request.user
         user = User.objects.get(id=request.user.id)
         data['location'] = user.location
-        data['idUser']=user.idUser
         self.perform_create(serializer)
 
         # return 201 status code
