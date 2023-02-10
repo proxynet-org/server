@@ -21,6 +21,10 @@ python manage.py < scripts/init.py
 # run the server
 python manage.py runserver
 
+# run the server (optional : with a working websocket)
+docker run -p 6379:6379 -d redis:5
+python manage.py runserver
+
 # launch the unit tests
 python manage.py test
 ```

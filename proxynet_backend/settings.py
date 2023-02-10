@@ -56,6 +56,14 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'users.User'
 ASGI_APPLICATION = "proxynet_backend.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/users/'
 LOGIN_REQUIRED_URLS = (
