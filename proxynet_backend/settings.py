@@ -33,12 +33,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
     # libs
     'rest_framework',
     'chartjs',
@@ -46,6 +40,14 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'django_extensions',
     'corsheaders',
+    'daphne',
+    # django
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
     # apps
     'content',
     'users',
@@ -53,6 +55,7 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'users.User'
+ASGI_APPLICATION = "proxynet_backend.asgi.application"
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/users/'
 LOGIN_REQUIRED_URLS = (
