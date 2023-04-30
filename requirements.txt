@@ -35,3 +35,6 @@ drf-spectacular==0.25.1
 django-cors-headers==3.13.0
 channels[daphne]
 Pillow==9.5.0
+channels-redis==4.1.0
+redis==4.5.4
+
