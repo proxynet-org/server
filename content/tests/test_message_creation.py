@@ -31,7 +31,7 @@ class TestMessageCreateAuthenticatedTest(APITestCase):
             username='testuser',
             password='12345',
             # coodonates of spain
-            location='40.4167754,-3.7037901999999576',
+            coordinates='40.4167754,-3.7037901999999576',
         )
         # login the user
         self.client.force_authenticate(user=self.user)
@@ -40,5 +40,5 @@ class TestMessageCreateAuthenticatedTest(APITestCase):
         response = self.client.post(self.url, {'text': 'Hello World'})
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['text'], 'Hello World')
-        self.assertEqual(response.data['location'],
+        self.assertEqual(response.data['coordinates'],
                          '40.4167754,-3.7037901999999576')

@@ -14,7 +14,7 @@ class User(AbstractUser):
     first_name = models.CharField(_("First name"), max_length=30, blank=False, null=False)
     last_name = models.CharField(_("Last name"), max_length=30, blank=False, null=False)
     email = models.EmailField(_("Email address"), blank=False, null=False)
-    location = models.CharField(_("Location"), blank=True, max_length=255)
+    coordinates = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):

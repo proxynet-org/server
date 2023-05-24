@@ -11,22 +11,22 @@ if not User.objects.filter(username='admin').exists():
     admin = User.objects.create_user(
         username='admin',
         password='admin',
-        # location is at Paris
-        location='48.856614,2.3522219',
+        # coordinates is at Paris
+        coordinates='48.856614,2.3522219',
     )
     admin.is_staff = True
     admin.is_superuser = True
     admin.save()
 
-# Create 10 users with a password and a location
+# Create 10 users with a password and a coordinates
 
 
-def create_user(username, password, location):
+def create_user(username, password, coordinates):
     if not User.objects.filter(username=username).exists():
         User.objects.create_user(
             username=username,
             password=password,
-            location=location,
+            coordinates=coordinates,
         )
 
 

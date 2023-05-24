@@ -16,7 +16,7 @@ class TestZoneCreateUnauthenticatedTest(APITestCase):
 
     def test_zone_create_unauthenticated(self):
         url = reverse('zone-list')
-        response = self.client.post(url, {'location': '40.4167754,-3.7037901999999576','max_slots':30,'occupied_slots':15})
+        response = self.client.post(url, {'coordinates': {'latitude': 40.4167754, 'longitude': -3.7037901999999576}, 'max_slots': 30, 'occupied_slots': 15}, format='json')
         self.assertEqual(response.status_code, 401)
         self.assertEqual(
             response.data['detail'], 'Authentication credentials were not provided.')
@@ -33,15 +33,18 @@ class TestZoneCreateAuthenticatedTest(APITestCase):
             username='testuser',
             password='12345',
             # coodonates of spain
-            location='40.4167754,-3.7037901999999576',
+            coordinates={
+                "latitude": "40.4167754",
+                "longitude": "-3.7037901999999576"
+            }
         )
         # login the user
         self.client.force_authenticate(user = self.user)
 
     def test_zone_crud_authenticated(self):
         # create / list view
-        data = {'location': '40.4167754,-3.7037901999999576','max_slots':30,'occupied_slots':15}
-        response = self.client.post(self.url, data)
+        data = {'coordinates': {'latitude': 40.4167754, 'longitude': -3.7037901999999576}, 'max_slots': 30, 'occupied_slots': 15}
+        response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, 201)
 
         # read / list view

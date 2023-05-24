@@ -13,14 +13,20 @@ class TestUpdateUserLocation(APITestCase):
             username='user_a',
             password='user_a',
             # Paris location
-            location='48.856614,2.3522219',
+            coordinates={
+                "latitude": "48.856614",
+                "longitude": "2.352222"
+            }
         )
 
         self.user_b = User.objects.create_user(
             username='user_b',
             password='user_b',
             # London location
-            location='51.507351,-0.127758',
+            coordinates={
+                "latitude": "51.507351",
+                "longitude": "-0.127758"
+            }
         )
 
         self.user_a_client = APIClient()
@@ -49,7 +55,10 @@ class TestUpdateUserLocation(APITestCase):
 
         url = reverse('update-user-location')
         data = {
-            'location': '48.856614,2.3522219',
+            'coordinates': {
+                "latitude": "48.856614",
+                "longitude": "2.3522219"
+            }
         }
         response = self.user_b_client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
