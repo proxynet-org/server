@@ -41,4 +41,3 @@ class TestPublicationCreation(APITestCase):
             'text': 'Hi from Paris',
         }
         response = self.user_a_client.post(reverse('publication-list'), data)
-        print(response.data)

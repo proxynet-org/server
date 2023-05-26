@@ -55,12 +55,12 @@ class TestUpdateUserLocation(APITestCase):
 
         url = reverse('update-user-location')
         data = {
-            'coordinates': {
+            "coordinates": {
                 "latitude": "48.856614",
-                "longitude": "2.3522219"
+                "longitude": "2.352222"
             }
         }
-        response = self.user_b_client.post(url, data)
+        response = self.user_b_client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # user_b sees the message

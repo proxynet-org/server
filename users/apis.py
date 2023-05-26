@@ -21,14 +21,8 @@ class UserViewSet(viewsets.ModelViewSet):
 @permission_classes([IsAuthenticated])
 @renderer_classes([JSONRenderer])
 def update_user_location(request, *args, **kwargs):
-    """
-    expected json data
-    {
-        "location": "48.856614,2.3522219"
-    }
-    """
     user = User.objects.get(id=request.user.id)
-    # retrive location from post data
-    user.location = request.POST.get('location')
+    coordinates = request.data['coordinates']
+    user.coordinates = coordinates
     user.save()
     return Response(status=status.HTTP_200_OK)

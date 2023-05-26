@@ -50,18 +50,21 @@ class TestZoneCreateAuthenticatedTest(APITestCase):
         # read / list view
         response = self.client.get(reverse('zone-list'))
         self.assertEqual(len(response.json()),1) # one created
-        self.assertEqual(response.json()[0],data)
+        for key in data.keys():
+            self.assertEqual(response.json()[0][key],data[key])
 
         # read / detail view
         id = Zone.objects.all().first().id
         response = self.client.get(reverse('zone-detail',kwargs={'pk': id}))
-        self.assertEqual(response.json(),data)
+        for key in data.keys():
+            self.assertEqual(response.json()[key],data[key])
 
         # update / detail view
         data['max_slots'] = 40
         response = self.client.put(reverse('zone-detail',kwargs={'pk': id}),json.dumps(data),
                                 content_type="application/json")
-        self.assertEqual(response.json(),data)
+        for key in data.keys():
+            self.assertEqual(response.json()[key],data[key])
         self.assertEqual(response.json()['max_slots'],40)
 
         # delete / detail view

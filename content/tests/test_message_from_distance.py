@@ -22,19 +22,28 @@ class TestMessagesFromDistance(APITestCase):
             username='testuser1',
             password='12345',
             # coodonates of Paris, France
-            coordinates='48.8566969,2.3514616',
+            coordinates={
+                "latitude": "48.856614",
+                "longitude": "2.352222"
+            }
         )
         self.user2 = User.objects.create_user(
             username='testuser2',
             password='12345',
             # coodonates of 1km away from Paris, France
-            coordinates='48.8576969,2.3514616',
+            coordinates={
+                "latitude": "48.864716",
+                "longitude": "2.349014"
+            }
         )
         self.user3 = User.objects.create_user(
             username='testuser3',
             password='12345',
             # coodonates of New York, USA
-            coordinates='40.730610,-73.935242',
+            coordinates={
+                "latitude": "40.730610",
+                "longitude": "-73.935242"
+            }
         )
 
         # Each user post "Hello World" message

@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 from users.models import User
+from django.urls import reverse
+import websocket
 
 # Create your models here.
 
@@ -59,7 +61,9 @@ class Publication(models.Model):
             if self.image:
                 self.image = self.compressImage(self.image)
         self.updated_at = timezone.now()
+
         return super(Publication, self).save(*args, **kwargs)
+
     def compressImage(self, image:models.ImageField):
         # compress image
         from PIL import Image

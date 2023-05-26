@@ -1,6 +1,8 @@
 # path for message viewset
 from django.urls import path
+from users import routing
 from .apis import MessageViewSet, PrivateMessageViewSet, PublicationViewSet
+from django.urls import include
 
 urlpatterns = [
     path('api/messages/', MessageViewSet.as_view({
@@ -30,5 +32,6 @@ urlpatterns = [
         'put': 'update',
         'delete': 'destroy'
     }), name='publication-detail'),
+    path("", include(routing.websocket_urlpatterns)),
 
 ]
