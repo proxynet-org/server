@@ -102,14 +102,10 @@ class PublicationViewSet(viewsets.ModelViewSet):
         socket = reverse('websocket', kwargs={'room_name': "publications"})
         socket_url = f"ws://localhost:8000{socket}"
 
-        signal = {
-            "message" : "Post has been created",
-            "coordinates" : data["coordinates"]
-        }
 
         ws = websocket.WebSocket()
         ws.connect(socket_url)
-        ws.send(str(signal))
+        ws.send(str(serializer.data))
         ws.close()
 
 
