@@ -16,6 +16,7 @@ class UserViewSet(viewsets.ModelViewSet):
             permission_classes = [AllowAny]
         else:
             permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

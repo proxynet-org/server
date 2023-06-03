@@ -103,10 +103,13 @@ class PublicationViewSet(viewsets.ModelViewSet):
         socket_url = f"ws://localhost:8000{socket}"
 
 
-        ws = websocket.WebSocket()
-        ws.connect(socket_url)
-        ws.send(str(serializer.data))
-        ws.close()
+        try:
+            ws = websocket.WebSocket()
+            ws.connect(socket_url)
+            ws.send(str(serializer.data))
+            ws.close()
+        except:
+            print("No websocket server running")
 
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
