@@ -1,0 +1,107 @@
+{% extends 'web/base.html' %}
+{% load static %}
+
+{% block title %} Proxynet - User details {% endblock %}
+
+{% block content %}
+<body>
+  <div class="container">
+    <!-- User Details -->
+    <div class="card mt-5">
+      <div class="card-header">
+        <h2>User Details</h2>
+      </div>
+      <div class="card-body">
+        <ul class="list-group">
+          <li class="list-group-item"><strong>ID:</strong> {{ user.id }}</li>
+          <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
+          <li class="list-group-item"><strong>User Hash:</strong> {{ user.hash }}</li>
+          <li class="list-group-item"><strong>First Name:</strong> {{ user.first_name }}</li>
+          <li class="list-group-item"><strong>Last Name:</strong> {{ user.last_name }}</li>
+          <li class="list-group-item"><strong>Created At:</strong> {{ user.created_at }}</li>
+          <li class="list-group-item"><strong>Updated At:</strong> {{ user.updated_at }}</li>
+          {% if user.is_banned %}
+            {% if ban_definite %}
+            <li class="list-group-item text-danger"><strong>Warning:</strong> This user is banned forever </li>
+            {% else %}
+            <li class="list-group-item text-danger"><strong>Warning:</strong> This user is banned until {{ ban_date }} </li>
+            {% endif %}
+
+          {% else %}
+          <li class="list-group-item text-primary"><strong>State:</strong> This user is actif</li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+
+    <form action="{% url 'block-user' user.id %}" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="user_id" value="{{ user.id }}">
+
+      <div class="card mt-5">
+        <div class="card-header">
+          <h2>User punishement</h2>
+        </div>
+      <div class="input-group mb-3 mt-3">
+        <span class="input-group-text" for="ban_duration">Ban Duration in days</span>
+        <input type="number" name="ban_duration" class="form-control" placeholder="Ban Duration (in days)" value="1">
+        <div class="input-group-append">
+          <button type="submit" class="btn btn-danger ml-3">Ban User</button>
+          <button type="submit" class="btn btn-danger ml-3" name="definite_ban" value="true">Definite Ban</button>
+          {% if user.is_banned %}
+          <button type="submit" class="btn btn-warning ml-3" name="unblock" value="true">Remove Ban</button>
+          {% endif %}
+        </div>
+      </div>
+      </div>
+    </form>
+
+    <!-- Message Sections -->
+    <h2>Messages</h2>
+    <ul class="nav nav-tabs" id="messageTabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="general-server-tab" data-toggle="tab" href="#general-server" role="tab" aria-controls="general-server" aria-selected="true">General Server</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="chatrooms-tab" data-toggle="tab" href="#chatrooms" role="tab" aria-controls="chatrooms" aria-selected="false">Chatrooms</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="private-messages-tab" data-toggle="tab" href="#private-messages" role="tab" aria-controls="private-messages" aria-selected="false">Private Messages</a>
+      </li>
+    </ul>
+    <div class="tab-content" id="messageTabsContent">
+      <!-- General Server Messages -->
+      <div class="tab-pane fade show active" id="general-server" role="tabpanel" aria-labelledby="general-server-tab">
+        <h3>Messages on General Server</h3>
+        <ul class="list-group">
+          {% for message in messages %}
+            <li class="list-group-item">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Chatroom Messages -->
+      <div class="tab-pane fade" id="chatrooms" role="tabpanel" aria-labelledby="chatrooms-tab">
+        <h3>Messages in Chatrooms</h3>
+        <ul class="list-group">
+          {% for chatroom in chatrooms %}
+            <li class="list-group-item">{{ chatroom.name }}: {{ chatroom.message }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Private Messages -->
+      <div class="tab-pane fade" id="private-messages" role="tabpanel" aria-labelledby="private-messages-tab">
+        <h3>Private Messages between Friends</h3>
+        <ul class="list-group">
+          {% for friend in friends %}
+            <li class="list-group-item">{{ friend.name }}: {{ friend.message }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+{% endblock %}

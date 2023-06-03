@@ -14,7 +14,8 @@ urlpatterns = [
     # html views
     path("", views.home, name="home"),
     path("users/", views.users, name="users"),
-    path("users/<int:user_id>/", views.edit_user, name="edit-user"),
+    path("users/<int:user_id>/", views.user_details, name="user-details"),
+    path("users/<int:user_id>/block/", views.block_user, name="block-user"),
     path("chat/", views.chat, name="chat"),
     path("chat/<str:room_name>/", views.room, name="room"),
 
