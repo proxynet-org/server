@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from .models import Message, PrivateMessage, Publication
-from .serializers import MessageSerializer, PrivateMessageSerializer, PublicationSerializer
+from .models import Message, PrivateMessage, Publication, Comment
+from .serializers import MessageSerializer, PrivateMessageSerializer, PublicationSerializer, CommentSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
@@ -9,6 +9,8 @@ from .utils import get_distance_from_two_coordinates
 from django.conf import settings
 import websocket
 from django.urls import reverse
+from django.db.models import Q
+
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
@@ -81,6 +83,7 @@ class PrivateMessageViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(messages, many=True)
         return Response(serializer.data)
 
+
 class PublicationViewSet(viewsets.ModelViewSet):
     queryset = Publication.objects.all()
     serializer_class = PublicationSerializer
@@ -101,7 +104,6 @@ class PublicationViewSet(viewsets.ModelViewSet):
 
         socket = reverse('websocket', kwargs={'room_name': "publications"})
 
-
         try:
             socket = reverse('websocket', kwargs={'room_name': "publications"})
             socket_url = settings.WEBSOCKET_URL + socket
@@ -112,3 +114,25 @@ class PublicationViewSet(viewsets.ModelViewSet):
             print("Error connecting to websocket, or wrong url specified in settings.py")
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def list_comments(self, request, *args, **kwargs):
+        # get the publication id from the url <int:pk>
+        publication_id = kwargs['pk']
+        # get the publication
+        publication = Publication.objects.get(id=publication_id)
+        # get the comments and is_reply=False
+        comments = Comment.objects.filter(Q(publication=publication) & Q(is_reply=False)).order_by('created_at')
+        # return the comments
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
+
+    def list_comments_of_comments(self, request, *args, **kwargs):
+        # get the comment id from the url <int:pk>
+        comment_id = kwargs['pk-comment']
+        # get the comment
+        comment = Comment.objects.get(id=comment_id)
+        # get the comments
+        comments = Comment.objects.filter(comment=comment).order_by('created_at')
+        # return the comments
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)

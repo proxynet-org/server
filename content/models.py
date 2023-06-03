@@ -48,7 +48,6 @@ class Publication(models.Model):
     text = models.TextField()
     likes = models.ManyToManyField(User, related_name='likes', blank=True)
     dislikes = models.ManyToManyField(User, related_name='dislikes', blank=True)
-    comments = models.ManyToManyField(User, related_name='comments', blank=True)
     coordinates = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -81,3 +80,24 @@ class Publication(models.Model):
         outputIoStream.seek(0)
         image = InMemoryUploadedFile(outputIoStream,'ImageField', "%s.jpg" %image.name.split('.')[0], 'image/jpeg', sys.getsizeof(outputIoStream), None)
         return image
+
+
+class Comment(models.Model):
+    is_reply = models.BooleanField(default=False)
+    parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='replies')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    publication = models.ForeignKey(Publication, on_delete=models.CASCADE)
+    text = models.TextField()
+    likes = models.ManyToManyField(User, related_name='comment_likes', blank=True)
+    dislikes = models.ManyToManyField(User, related_name='comment_dislikes', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.publication}: {self.text}"
+    
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.created_at = timezone.now()
+        self.updated_at = timezone.now()
+        return super(Comment, self).save(*args, **kwargs)

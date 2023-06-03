@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Message, PrivateMessage, Publication
+from .models import Message, PrivateMessage, Publication, Comment
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -59,7 +59,7 @@ class PublicationSerializer(serializers.ModelSerializer):
         return len(obj.dislikes.all())
     
     def get_num_comments(self, obj):
-        return len(obj.comments.all())
+        return len(Comment.objects.filter(publication=obj))
     
     def get_reaction(self, obj):
         user = self.context['request'].user
@@ -69,3 +69,15 @@ class PublicationSerializer(serializers.ModelSerializer):
             return 'DISLIKE'
         else:
             return 'NONE'
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ('id', 'user', 'publication', 'text', 'created_at', 'updated_at')
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'user': {'read_only': True},
+            'publication': {'read_only': True},
+            'created_at': {'read_only': True},
+            'updated_at': {'read_only': True},
+        }

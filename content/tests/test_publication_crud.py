@@ -51,3 +51,26 @@ class TestPublicationCreation(APITestCase):
         self.assert_(response.data['num_dislikes'] == 0)
         self.assert_(response.data['num_comments'] == 0)
         self.assert_(response.data['reaction'] == 'NONE')
+
+    
+    def test_delete_publication(self):
+        num_of_posts = None
+        # list posts and get the number of posts
+        response = self.user_a_client.get(reverse('publication-list'))
+        num_of_posts = len(response.data)
+        self.assertEqual(num_of_posts, 0)
+        data = {
+            'title': 'Hi from Paris',
+            'text': 'Hi from Paris',
+        }
+        response = self.user_a_client.post(reverse('publication-list'), data)
+        publication_id = response.data['id']
+        response = self.user_a_client.get(reverse('publication-list'))
+        num_of_posts = len(response.data)
+        self.assertEqual(num_of_posts, 1)
+        response = self.user_a_client.delete(reverse('publication-detail', args=[publication_id]))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(response.data, None)
+        response = self.user_a_client.get(reverse('publication-list'))
+        num_of_posts = len(response.data)
+        self.assertEqual(num_of_posts, 0)
