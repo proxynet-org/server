@@ -50,7 +50,7 @@ class TestPublicationCreation(APITestCase):
         self.assert_(response.data['num_likes'] == 0)
         self.assert_(response.data['num_dislikes'] == 0)
         self.assert_(response.data['num_comments'] == 0)
-        #self.assert_(response.data['reaction'] == 'NONE')
+        self.assert_(response.data['reaction'] == 'NONE')
 
     
     def test_delete_publication(self):
@@ -95,7 +95,7 @@ class TestPublicationCreation(APITestCase):
         self.assert_(response.data['num_likes'] == 0)
         self.assert_(response.data['num_dislikes'] == 0)
         self.assert_(response.data['num_comments'] == 0)
-        #self.assert_(response.data['reaction'] == 'NONE')
+        self.assert_(response.data['reaction'] == 'NONE')
 
     def test_like_publication(self):
         data = {
@@ -106,7 +106,7 @@ class TestPublicationCreation(APITestCase):
         publication_id = response.data['id']
         response = self.user_a_client.post(reverse('publication-like', args=[publication_id]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        #self.assertEqual(response.data['reaction'], 'LIKE')
+        self.assertEqual(response.data['reaction'], 'LIKE')
         self.assertEqual(response.data['num_likes'], 1)
         self.assertEqual(response.data['num_dislikes'], 0)
         self.assertEqual(response.data['num_comments'], 0)
@@ -120,7 +120,7 @@ class TestPublicationCreation(APITestCase):
         publication_id = response.data['id']
         response = self.user_a_client.post(reverse('publication-dislike', args=[publication_id]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        #self.assertEqual(response.data['reaction'], 'DISLIKE')
+        self.assertEqual(response.data['reaction'], 'DISLIKE')
         self.assertEqual(response.data['num_likes'], 0)
         self.assertEqual(response.data['num_dislikes'], 1)
         self.assertEqual(response.data['num_comments'], 0)

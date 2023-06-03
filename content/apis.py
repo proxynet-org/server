@@ -41,7 +41,7 @@ class MessageViewSet(viewsets.ModelViewSet):
                 user.coordinates, message.coordinates)
             if distance <= range:
                 messages_within_range.append(message)
-        serializer = self.get_serializer(messages_within_range, many=True)
+        serializer = self.get_serializer(messages_within_range, many=True, context={'request': request})
         return Response(serializer.data)
 
 
@@ -115,6 +115,15 @@ class PublicationViewSet(viewsets.ModelViewSet):
             print("Error while sending publication to websocket")
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def retrieve(self, request, *args, **kwargs):
+        # get the publication id from the url <int:pk>
+        publication_id = kwargs['pk']
+        # get the publication
+        publication = Publication.objects.get(id=publication_id)
+        # return the publication
+        serializer = PublicationSerializer(publication, context={'user': request.user})
+        return Response(serializer.data)
     
     def list(self, request, *args, **kwargs):
         # only show publications from users within 100km
@@ -127,15 +136,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
                 user.coordinates, publication.coordinates)
             if distance <= range:
                 publications_within_range.append(publication)
-        # add reaction field to each publication
-        for publication in publications_within_range:
-            if user in publication.likes.all():
-                publication.reaction = 'LIKE'
-            elif user in publication.dislikes.all():
-                publication.reaction = 'DISLIKE'
-            else:
-                publication.reaction = 'NONE'
-        serializer = self.get_serializer(publications_within_range, many=True)
+        serializer = PublicationSerializer(publications_within_range, many=True, context={'user': user})
         return Response(serializer.data)
 
     def like(self, request, *args, **kwargs):
@@ -153,7 +154,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
         if user in publication.dislikes.all():
             publication.dislikes.remove(user)
         # return the publication
-        serializer = PublicationSerializer(publication)
+        serializer = PublicationSerializer(publication, context={'user': request.user})
         return Response(serializer.data)
     
     def dislike(self, request, *args, **kwargs):
@@ -171,7 +172,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
         if user in publication.likes.all():
             publication.likes.remove(user)
         # return the publication
-        serializer = PublicationSerializer(publication)
+        serializer = PublicationSerializer(publication, context={'user': request.user})
         return Response(serializer.data)
 
     def list_comments(self, request, *args, **kwargs):
@@ -181,17 +182,8 @@ class PublicationViewSet(viewsets.ModelViewSet):
         publication = Publication.objects.get(id=publication_id)
         # get the comments and is_reply=False
         comments = Comment.objects.filter(Q(publication=publication) & Q(is_reply=False)).order_by('created_at')
-        # get user reaction
-        user = User.objects.get(id=request.user.id)
-        for comment in comments:
-            if user in comment.likes.all():
-                comment.reaction = 'LIKE'
-            elif user in comment.dislikes.all():
-                comment.reaction = 'DISLIKE'
-            else:
-                comment.reaction = 'NONE'
         # return the comments
-        serializer = CommentSerializer(comments, many=True)
+        serializer = CommentSerializer(comments, many=True, context={'user': request.user})
         return Response(serializer.data)
 
     def list_comments_of_comments(self, request, *args, **kwargs):
@@ -211,7 +203,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
             else:
                 comment.reaction = 'NONE'
         # return the comments
-        serializer = CommentSerializer(comments, many=True)
+        serializer = CommentSerializer(comments, many=True, context={'user': request.user})
         return Response(serializer.data)
 
     def add_comment(self, request, *args, **kwargs):
@@ -227,7 +219,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
         comment = Comment.objects.create(
             publication=publication, text=text, user=user)
         # return the comment
-        serializer = CommentSerializer(comment)
+        serializer = CommentSerializer(comment, context={'user': request.user})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def add_comment_reply(self, request, *args, **kwargs):
@@ -243,7 +235,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
         comment = Comment.objects.create(
             user=user, publication=comment.publication, text=text, parent_comment=comment, is_reply=True)
         # return the comment
-        serializer = CommentSerializer(comment)
+        serializer = CommentSerializer(comment, context={'user': request.user})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def like_comment(self, request, *args, **kwargs):
@@ -261,7 +253,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
         if user in comment.dislikes.all():
             comment.dislikes.remove(user)
         # return the comment
-        serializer = CommentSerializer(comment)
+        serializer = CommentSerializer(comment, context={'user': request.user})
         return Response(serializer.data)
 
     def dislike_comment(self, request, *args, **kwargs):
@@ -279,5 +271,5 @@ class PublicationViewSet(viewsets.ModelViewSet):
         if user in comment.likes.all():
             comment.likes.remove(user)
         # return the comment
-        serializer = CommentSerializer(comment)
+        serializer = CommentSerializer(comment, context={'user': request.user})
         return Response(serializer.data)
