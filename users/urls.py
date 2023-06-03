@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView
-from .apis import UserViewSet, update_user_location
+from .apis import UserViewSet, update_user_location, get_user_info
 from . import views
 
 urlpatterns = [
@@ -12,6 +12,6 @@ urlpatterns = [
     path('api/users/register/', UserViewSet.as_view({
         'post': 'create'
     }), name='user-registration'),
+    path('api/users/info/', get_user_info, name='get-user-info'),
     path("", views.home, name="home"),
-    path("login/", views.custom_login, name="login")
 ]
