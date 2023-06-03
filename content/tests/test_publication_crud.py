@@ -41,3 +41,10 @@ class TestPublicationCreation(APITestCase):
             'text': 'Hi from Paris',
         }
         response = self.user_a_client.post(reverse('publication-list'), data)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['title'], data['title'])
+        self.assertEqual(response.data['text'], data['text'])
+        self.assertEqual(response.data['user'], self.user_a.id)
+        self.assertEqual(response.data['coordinates'], self.user_a.coordinates)
+        self.assert_(response.data['num_likes'] == 0)

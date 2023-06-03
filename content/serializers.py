@@ -28,9 +28,11 @@ class PrivateMessageSerializer(serializers.ModelSerializer):
         }
 
 class PublicationSerializer(serializers.ModelSerializer):
+    # num_likes counts the items in likes
+    num_likes = serializers.SerializerMethodField()
     class Meta:
         model = Publication
-        fields = ('id','user', 'title', 'text', 'likes', 'dislikes', 'comments', 'created_at', 'updated_at', 'coordinates', 'image')
+        fields = ('id','user', 'title', 'text', 'likes', 'dislikes', 'comments', 'created_at', 'updated_at', 'coordinates', 'image' , 'num_likes')
         extra_kwargs = {
             'id': {'read_only': True},
             'user': {'read_only': True},
@@ -41,3 +43,5 @@ class PublicationSerializer(serializers.ModelSerializer):
             'updated_at': {'read_only': True},
             'coordinates': {'read_only': True},
         }
+    def get_num_likes(self, obj):
+        return len(obj.likes.all())

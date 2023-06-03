@@ -100,16 +100,15 @@ class PublicationViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
 
         socket = reverse('websocket', kwargs={'room_name': "publications"})
-        socket_url = f"ws://localhost:8000{socket}"
 
 
         try:
+            socket = reverse('websocket', kwargs={'room_name': "publications"})
+            socket_url = settings.WEBSOCKET_URL + socket
             ws = websocket.WebSocket()
             ws.connect(socket_url)
-            ws.send(str(serializer.data))
             ws.close()
         except:
-            print("No websocket server running")
-
+            print("Error connecting to websocket, or wrong url specified in settings.py")
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
