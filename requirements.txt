@@ -38,3 +38,4 @@ Pillow==9.5.0
 channels-redis==4.1.0
 redis==4.5.4
 websocket-client==1.5.2
+django-ajax-datatable==4.4.5

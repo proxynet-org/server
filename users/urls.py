@@ -4,14 +4,20 @@ from .apis import UserViewSet, update_user_location, get_user_info
 from . import views
 
 urlpatterns = [
-    path("chat/", views.chat, name="chat"),
-    path("chat/<str:room_name>/", views.room, name="room"),
-
-    path("login/", LoginView.as_view(), name="login"),
+    # apis
     path('api/users/location/', update_user_location, name='update-user-location'),
     path('api/users/register/', UserViewSet.as_view({
         'post': 'create'
     }), name='user-registration'),
     path('api/users/info/', get_user_info, name='get-user-info'),
+
+    # html views
     path("", views.home, name="home"),
+    path("users/", views.users, name="users"),
+    path("users/<int:user_id>/", views.edit_user, name="edit-user"),
+    path("chat/", views.chat, name="chat"),
+    path("chat/<str:room_name>/", views.room, name="room"),
+
+    # data views
+    path('users/search/', views.search_users, name='search-users'),
 ]

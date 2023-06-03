@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'corsheaders',
     'daphne',
+    'ajax_datatable',
     # django
     'django.contrib.admin',
     'django.contrib.auth',
@@ -74,8 +75,9 @@ CHANNEL_LAYERS = {
         },
     },
 }
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/users/'
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 LOGIN_REQUIRED_URLS = (
     r'(.*)',
 )
@@ -86,6 +88,8 @@ LOGIN_REQUIRED_URLS_EXCEPTIONS = (
     r'/media(.*)$',
     # home page
     r'/$',
+    # login page
+    r'/login/$',
 )
 
 SIMPLE_JWT = {
