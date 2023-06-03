@@ -102,16 +102,17 @@ class PublicationViewSet(viewsets.ModelViewSet):
         # return 201 status code
         headers = self.get_success_headers(serializer.data)
 
-        socket = reverse('websocket', kwargs={'room_name': "publications"})
 
         try:
             socket = reverse('websocket', kwargs={'room_name': "publications"})
             socket_url = settings.WEBSOCKET_URL + socket
             ws = websocket.WebSocket()
             ws.connect(socket_url)
+            ws.send(str(serializer.data))
             ws.close()
-        except:
-            print("Error connecting to websocket, or wrong url specified in settings.py")
+        except Exception as e:
+            print(e)
+            print("Error while sending publication to websocket")
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
