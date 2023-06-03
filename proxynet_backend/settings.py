@@ -74,7 +74,7 @@ CHANNEL_LAYERS = {
         },
     },
 }
-LOGIN_URL = '/login/'
+LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/users/'
 LOGIN_REQUIRED_URLS = (
     r'(.*)',
@@ -84,6 +84,8 @@ LOGIN_REQUIRED_URLS_EXCEPTIONS = (
     r'/api(.*)$',
     r'/login(.*)$',
     r'/media(.*)$',
+    # home page
+    r'/$',
 )
 
 SIMPLE_JWT = {

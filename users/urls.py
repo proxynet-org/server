@@ -12,4 +12,6 @@ urlpatterns = [
     path('api/users/register/', UserViewSet.as_view({
         'post': 'create'
     }), name='user-registration'),
+    path("", views.home, name="home"),
+    path("login/", views.custom_login, name="login")
 ]
