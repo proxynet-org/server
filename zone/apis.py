@@ -23,8 +23,10 @@ class ChatroomViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        data = serializer.validated_data
         user = User.objects.get(id=request.user.id)
+        data = serializer.validated_data
+        data["capacity"] = int(request.data["capacity"])
+        data["lifetime"] = int(request.data["lifetime"])
         data['coordinates'] = user.coordinates
         self.perform_create(serializer)
 
