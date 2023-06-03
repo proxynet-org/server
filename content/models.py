@@ -6,6 +6,8 @@ import websocket
 
 # Create your models here.
 
+def publications_img_upload_to(instance, filename):
+    return 'images/publications_files/{filename}'.format(filename=filename)
 
 class Message(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -50,7 +52,7 @@ class Publication(models.Model):
     coordinates = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    image = models.ImageField(upload_to='publications', blank=True, null=True)
+    image = models.ImageField(upload_to=publications_img_upload_to, blank=True, null=True)
 
     def __str__(self):
         return self.text
