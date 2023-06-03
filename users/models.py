@@ -17,6 +17,9 @@ class User(AbstractUser):
     coordinates = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    is_in_chatroom = models.BooleanField(default=False)
+
     def __str__(self):
         return self.username
 
