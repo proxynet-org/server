@@ -82,12 +82,14 @@ class ChatroomViewSet(viewsets.ModelViewSet):
     def send_message_to_chatroom(self, request, pk=None):
         user = User.objects.get(id=request.user.id)
         chatroom = Chatroom.objects.get(id=pk)
+        coordinates = chatroom.coordinates
         message = request.data['text']
         if user in chatroom.current_users.all():
-            msg = ChatroomMessage.objects.create(user=user, chatroom=chatroom, text=message)
+            msg = ChatroomMessage.objects.create(user=user, chatroom=chatroom, text=message, coordinates=coordinates)
             msg.save()
             chatroom.messages.add(msg)
-            return Response(status=status.HTTP_201_CREATED)
+            serializer = MessageSerializer(msg)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
