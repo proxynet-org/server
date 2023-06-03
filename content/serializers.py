@@ -36,12 +36,11 @@ class PublicationSerializer(serializers.ModelSerializer):
     num_likes = serializers.SerializerMethodField()
     num_dislikes = serializers.SerializerMethodField()
     num_comments = serializers.SerializerMethodField()
-    reaction = serializers.SerializerMethodField()
 
     class Meta:
         model = Publication
         fields = ('id', 'user', 'title', 'text', 'likes', 'dislikes', 'created_at',
-                  'updated_at', 'coordinates', 'image', 'num_likes', 'reaction', 'num_dislikes', 'num_comments')
+                  'updated_at', 'coordinates', 'image', 'num_likes', 'num_dislikes', 'num_comments')
         extra_kwargs = {
             'id': {'read_only': True},
             'user': {'read_only': True},
@@ -57,23 +56,20 @@ class PublicationSerializer(serializers.ModelSerializer):
 
     def get_num_dislikes(self, obj):
         return len(obj.dislikes.all())
-    
+
     def get_num_comments(self, obj):
         return len(Comment.objects.filter(publication=obj))
-    
-    def get_reaction(self, obj):
-        user = self.context['request'].user
-        if user in obj.likes.all():
-            return 'LIKE'
-        elif user in obj.dislikes.all():
-            return 'DISLIKE'
-        else:
-            return 'NONE'
+
 
 class CommentSerializer(serializers.ModelSerializer):
+    num_likes = serializers.SerializerMethodField()
+    num_dislikes = serializers.SerializerMethodField()
+    num_replies = serializers.SerializerMethodField()
+
     class Meta:
         model = Comment
-        fields = ('id', 'user', 'publication', 'text', 'created_at', 'updated_at')
+        fields = ('id', 'user', 'publication', 'text', 'likes', 'dislikes', 'created_at', 'updated_at',
+                   'num_likes', 'num_dislikes', 'is_reply', 'parent_comment' , 'num_replies')   
         extra_kwargs = {
             'id': {'read_only': True},
             'user': {'read_only': True},
@@ -81,3 +77,12 @@ class CommentSerializer(serializers.ModelSerializer):
             'created_at': {'read_only': True},
             'updated_at': {'read_only': True},
         }
+
+    def get_num_likes(self, obj):
+        return len(obj.likes.all())
+    
+    def get_num_dislikes(self, obj):
+        return len(obj.dislikes.all())
+
+    def get_num_replies(self, obj):
+        return len(Comment.objects.filter(parent_comment=obj))

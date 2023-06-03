@@ -114,6 +114,64 @@ class PublicationViewSet(viewsets.ModelViewSet):
             print("Error connecting to websocket, or wrong url specified in settings.py")
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    def list(self, request, *args, **kwargs):
+        # only show publications from users within 100km
+        user = User.objects.get(id=request.user.id)
+        publications = Publication.objects.all()
+        publications_within_range = []
+        range = settings.RADIUS_FOR_SEARCH
+        for publication in publications:
+            distance = get_distance_from_two_coordinates(
+                user.coordinates, publication.coordinates)
+            if distance <= range:
+                publications_within_range.append(publication)
+        # add reaction field to each publication
+        for publication in publications_within_range:
+            if user in publication.likes.all():
+                publication.reaction = 'LIKE'
+            elif user in publication.dislikes.all():
+                publication.reaction = 'DISLIKE'
+            else:
+                publication.reaction = 'NONE'
+        serializer = self.get_serializer(publications_within_range, many=True)
+        return Response(serializer.data)
+
+    def like(self, request, *args, **kwargs):
+        # get the publication id from the url <int:pk>
+        publication_id = kwargs['pk']
+        # get the publication
+        publication = Publication.objects.get(id=publication_id)
+        # get the user
+        user = User.objects.get(id=request.user.id)
+        # add the user to the likes
+        if user in publication.likes.all():
+            publication.likes.remove(user)
+        else :
+            publication.likes.add(user)
+        if user in publication.dislikes.all():
+            publication.dislikes.remove(user)
+        # return the publication
+        serializer = PublicationSerializer(publication)
+        return Response(serializer.data)
+    
+    def dislike(self, request, *args, **kwargs):
+        # get the publication id from the url <int:pk>
+        publication_id = kwargs['pk']
+        # get the publication
+        publication = Publication.objects.get(id=publication_id)
+        # get the user
+        user = User.objects.get(id=request.user.id)
+        # add the user to the dislikes
+        if user in publication.dislikes.all():
+            publication.dislikes.remove(user)
+        else :
+            publication.dislikes.add(user)
+        if user in publication.likes.all():
+            publication.likes.remove(user)
+        # return the publication
+        serializer = PublicationSerializer(publication)
+        return Response(serializer.data)
 
     def list_comments(self, request, *args, **kwargs):
         # get the publication id from the url <int:pk>
@@ -122,17 +180,103 @@ class PublicationViewSet(viewsets.ModelViewSet):
         publication = Publication.objects.get(id=publication_id)
         # get the comments and is_reply=False
         comments = Comment.objects.filter(Q(publication=publication) & Q(is_reply=False)).order_by('created_at')
+        # get user reaction
+        user = User.objects.get(id=request.user.id)
+        for comment in comments:
+            if user in comment.likes.all():
+                comment.reaction = 'LIKE'
+            elif user in comment.dislikes.all():
+                comment.reaction = 'DISLIKE'
+            else:
+                comment.reaction = 'NONE'
         # return the comments
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
     def list_comments_of_comments(self, request, *args, **kwargs):
         # get the comment id from the url <int:pk>
-        comment_id = kwargs['pk-comment']
+        comment_id = kwargs['pkComment']
         # get the comment
         comment = Comment.objects.get(id=comment_id)
         # get the comments
-        comments = Comment.objects.filter(comment=comment).order_by('created_at')
+        comments = Comment.objects.filter(parent_comment=comment).order_by('created_at')
+        # get user reaction
+        user = User.objects.get(id=request.user.id)
+        for comment in comments:
+            if user in comment.likes.all():
+                comment.reaction = 'LIKE'
+            elif user in comment.dislikes.all():
+                comment.reaction = 'DISLIKE'
+            else:
+                comment.reaction = 'NONE'
         # return the comments
         serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
+
+    def add_comment(self, request, *args, **kwargs):
+        # get the publication id from the url <int:pk>
+        publication_id = kwargs['pk']
+        # get the publication
+        publication = Publication.objects.get(id=publication_id)
+        # get the text
+        text = request.data['text']
+        # get the coordinates
+        user = User.objects.get(id=request.user.id)
+        # create the comment
+        comment = Comment.objects.create(
+            publication=publication, text=text, user=user)
+        # return the comment
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def add_comment_reply(self, request, *args, **kwargs):
+        # get the comment id from the url <int:pk>
+        comment_id = kwargs['pkComment']
+        # get the comment
+        comment = Comment.objects.get(id=comment_id)
+        # get the text
+        text = request.data['text']
+        # get the coordinates
+        user = User.objects.get(id=request.user.id)
+        # create the comment
+        comment = Comment.objects.create(
+            user=user, publication=comment.publication, text=text, parent_comment=comment, is_reply=True)
+        # return the comment
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def like_comment(self, request, *args, **kwargs):
+        # get the comment id from the url <int:pk>
+        comment_id = kwargs['pkComment']
+        # get the comment
+        comment = Comment.objects.get(id=comment_id)
+        # get the user
+        user = User.objects.get(id=request.user.id)
+        # add the user to the likes
+        if user in comment.likes.all():
+            comment.likes.remove(user)
+        else :
+            comment.likes.add(user)
+        if user in comment.dislikes.all():
+            comment.dislikes.remove(user)
+        # return the comment
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data)
+
+    def dislike_comment(self, request, *args, **kwargs):
+        # get the comment id from the url <int:pk>
+        comment_id = kwargs['pkComment']
+        # get the comment
+        comment = Comment.objects.get(id=comment_id)
+        # get the user
+        user = User.objects.get(id=request.user.id)
+        # add the user to the dislikes
+        if user in comment.dislikes.all():
+            comment.dislikes.remove(user)
+        else :
+            comment.dislikes.add(user)
+        if user in comment.likes.all():
+            comment.likes.remove(user)
+        # return the comment
+        serializer = CommentSerializer(comment)
         return Response(serializer.data)
