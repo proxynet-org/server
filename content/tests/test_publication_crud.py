@@ -48,3 +48,6 @@ class TestPublicationCreation(APITestCase):
         self.assertEqual(response.data['user'], self.user_a.id)
         self.assertEqual(response.data['coordinates'], self.user_a.coordinates)
         self.assert_(response.data['num_likes'] == 0)
+        self.assert_(response.data['num_dislikes'] == 0)
+        self.assert_(response.data['num_comments'] == 0)
+        self.assert_(response.data['reaction'] == 'NONE')
