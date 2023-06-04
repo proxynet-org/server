@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils import timezone
 from users.models import User
-from content.models import Message
 
 def chatroom_img_upload_to(instance, filename):
     return 'images/chatroom_files/{filename}'.format(filename=filename)
@@ -12,8 +11,13 @@ class Zone(models.Model):
     occupied_slots = models.IntegerField(blank=True)
 
 
-class ChatroomMessage(Message):
+class ChatroomMessages(models.Model):
     chatroom = models.ForeignKey('Chatroom', on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField(blank=True, null=True)
+    coordinates = models.JSONField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     def __str__(self):
         return self.text
@@ -35,6 +39,6 @@ class Chatroom(models.Model):
     lifetime = models.IntegerField(blank=True, null=True)
     is_open = models.BooleanField(default=True)
     is_available = models.BooleanField(default=True)
-    messages = models.ManyToManyField(ChatroomMessage, related_name='messages', blank=True)
+    messages = models.ManyToManyField(ChatroomMessages, related_name='chatroom_messages', blank=True)
     coordinates = models.JSONField(blank=True, null=True)
     

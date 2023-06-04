@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from .models import Zone, Chatroom, ChatroomMessage
+from .models import Zone, Chatroom, ChatroomMessages
 from .serializers import ZoneSerializer, ChatroomSerializer
 from content.serializers import MessageSerializer
 from rest_framework.permissions import IsAuthenticated
@@ -85,7 +85,7 @@ class ChatroomViewSet(viewsets.ModelViewSet):
         coordinates = chatroom.coordinates
         message = request.data['text']
         if user in chatroom.current_users.all():
-            msg = ChatroomMessage.objects.create(user=user, chatroom=chatroom, text=message, coordinates=coordinates)
+            msg = ChatroomMessages.objects.create(user=user, chatroom=chatroom, text=message, coordinates=coordinates)
             msg.save()
             chatroom.messages.add(msg)
             serializer = MessageSerializer(msg)
