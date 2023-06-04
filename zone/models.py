@@ -26,7 +26,7 @@ class ChatroomMessages(models.Model):
         if not self.id:
             self.created_at = timezone.now()
         self.updated_at = timezone.now()
-        return super(ChatroomMessage, self).save(*args, **kwargs)
+        return super(ChatroomMessages, self).save(*args, **kwargs)
 
 
 class Chatroom(models.Model):
