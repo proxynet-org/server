@@ -38,7 +38,6 @@ class PublicationSerializer(serializers.ModelSerializer):
     num_dislikes = serializers.SerializerMethodField()
     num_comments = serializers.SerializerMethodField()
     reaction = serializers.SerializerMethodField()
-    image = serializers.SerializerMethodField()
 
 
     class Meta:
@@ -75,15 +74,6 @@ class PublicationSerializer(serializers.ModelSerializer):
                 return 'NONE'
         else:
             return 'NONE'
-
-    def get_image(self, obj):
-        if obj.image:
-            base_url = self.context['request'].build_absolute_uri('/')
-            base_url = base_url[:-1] # remove last slash
-            url = base_url + obj.image.url
-            return url
-        else:
-            return None
 
 
 class CommentSerializer(serializers.ModelSerializer):
