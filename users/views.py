@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from content.models import Message
+from content.models import Message, Publication, Comment
+from django.db.models import Q
 from zone.models import Chatroom, ChatroomMessages
 from content.utils import get_distance_from_two_coordinates
 from django.shortcuts import redirect
@@ -101,3 +102,13 @@ def general_chatroom_details(request):
         focused_message_coordinates = Message.objects.get(id=focused_message).coordinates
         messages = [message for message in message_list if get_distance_from_two_coordinates(message.coordinates, focused_message_coordinates) < settings.RADIUS_FOR_SEARCH]
     return render(request, "admin/general_chat_details.html", {"messages": messages, "focused_message": focused_message})
+
+def publications(request):
+    publications = Publication.objects.all()
+    return render(request, "admin/publications.html", {"publications": publications})
+
+def publication_details(request, pk):
+    publication = Publication.objects.get(id=pk)
+    comments = Comment.objects.filter(Q(publication=publication) & Q(is_reply=False))
+
+    return render(request, "admin/publication_details.html", {"publication": publication, "comments": comments})

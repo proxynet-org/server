@@ -20,6 +20,8 @@ urlpatterns = [
     path("chatrooms/<int:pk>/", views.chatroom_details, name="chatroom-details"),
     path("general/", views.general_chatroom, name="general"),
     path("general-chat/", views.general_chatroom_details, name="general-chat"),
+    path("publications/", views.publications, name="publications"),
+    path("publications/<int:pk>/", views.publication_details, name="publication-details"),
     path("chat/", views.chat, name="chat"),
     path("chat/<str:room_name>/", views.room, name="room"),
 

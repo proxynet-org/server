@@ -1,0 +1,27 @@
+{% extends 'web/base.html' %}
+{% load static %}
+
+{% block title %}Proxynet - Publications{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>Publications</h1>
+  <ul class="list-group">
+    {% for publication in publications %}
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col-md-3">
+          {% if publication.image %}
+            <img src="{{ publication.image.url }}" class="img-fluid" alt="Publication Image">
+          {% endif %}
+        </div>
+        <div class="col-md-9">
+          <a href="{% url 'publication-details' publication.pk %}">{{ publication.title }}</a>
+          <p>{{ publication.text }}</p>
+        </div>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

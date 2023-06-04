@@ -25,6 +25,9 @@
         <li class="nav-item {% if request.path == '/users/' %}active{% endif %}">
           <a class="nav-link" href="{% url 'users' %}">Users</a>
         </li>
+        <li class="nav-item {% if request.path == '/publications/' %}active{% endif %}">
+          <a class="nav-link" href="{% url 'publications' %}">Publications</a>
+        </li>
         <li class="nav-item {% if request.path == '/chatrooms/' %}active{% endif %}">
           <a class="nav-link" href="{% url 'chatrooms' %}">Chatrooms</a>
         </li>
