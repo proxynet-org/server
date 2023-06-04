@@ -1,9 +1,15 @@
 from django.shortcuts import render
+from content.models import Message
+from zone.models import Chatroom, ChatroomMessages
+from content.utils import get_distance_from_two_coordinates
 from django.shortcuts import redirect
 from .models import User
 from django.http import JsonResponse
 from django.utils import timezone
 from datetime import timedelta
+from django.conf import settings
+
+
 
 
 def chat(request):
@@ -32,15 +38,20 @@ def search_users(request):
 
 def user_details(request, user_id):
     user = User.objects.get(id=user_id)
-    messages = []
-    chatrooms = []
+    messages = Message.objects.filter(user=user)
+    # Get all chatroomMessages from the user, and take only the chatrooms that have messages from the user
+    user_chatroom_messages = ChatroomMessages.objects.filter(user=user)
+    # get distinct chatrooms from the user_chatroom_messages
+    chatrooms_of_user_id = user_chatroom_messages.values('chatroom').distinct()
+    chatrooms_of_user = Chatroom.objects.filter(id__in=chatrooms_of_user_id)
+
     friends = []
     is_banned = user.is_banned()
     ban_definite = user.ban_duration == -1
     ban_duration = timedelta(days=user.ban_duration)  # Assuming user.ban_duration is the ban duration in days
     ban_until_date = timezone.now() + ban_duration
     ban_until_date_str = ban_until_date.strftime("%d %B %Y")
-    return render(request, "admin/user_details.html", {"user": user, "messages": messages, "chatrooms": chatrooms, "friends": friends, "is_banned": is_banned, "ban_date": ban_until_date_str, "ban_definite": ban_definite})
+    return render(request, "admin/user_details.html", {"user": user, "messages": messages, "chatrooms": chatrooms_of_user, "friends": friends, "is_banned": is_banned, "ban_date": ban_until_date_str, "ban_definite": ban_definite})
 
 def block_user(request ,user_id):
     if request.method == 'POST':
@@ -66,3 +77,27 @@ def block_user(request ,user_id):
             user.ban_date = timezone.now()
             user.save()
         return redirect('user-details', user_id=user_id) 
+
+def chatrooms(request):
+    chatrooms = Chatroom.objects.all()
+    print(chatrooms)
+    return render(request, "admin/chatrooms.html", {"chatrooms": chatrooms})
+
+def chatroom_details(request, pk):
+    chatroom = Chatroom.objects.get(id=pk)
+    chatroom_messages = ChatroomMessages.objects.filter(chatroom=chatroom)
+    return render(request, "admin/chatrooms_details.html", {"chatroom": chatroom, "messages": chatroom_messages})
+
+def general_chatroom(request):
+    messages = Message.objects.all()
+    return render(request, "admin/general_chat.html", {"messages": messages})
+
+def general_chatroom_details(request):
+    message_list = Message.objects.all()
+    focused_message = request.GET.get('focused_message')
+    messages = message_list
+    if focused_message:
+        focused_message = int(focused_message)
+        focused_message_coordinates = Message.objects.get(id=focused_message).coordinates
+        messages = [message for message in message_list if get_distance_from_two_coordinates(message.coordinates, focused_message_coordinates) < settings.RADIUS_FOR_SEARCH]
+    return render(request, "admin/general_chat_details.html", {"messages": messages, "focused_message": focused_message})

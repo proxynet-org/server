@@ -1,0 +1,37 @@
+{% extends 'web/base.html' %}
+{% load static %}
+
+{% block title %}Proxynet - Chatroom{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>Chat Messages</h1>
+  <p>By clicking on the user's name you can view the user's details.
+  By clicking on the message you can view the message and its context in the general chat.
+  The message that you clicked on will be highlighted in red.
+  And all the other messages you see are the messages that were sent in the same 2km radius.
+  </p>
+  <ul class="list-group">
+    {% for message in messages %}
+    <li class="list-group-item {% if message.id == focused_message %}bg-danger text-white{% endif %}" id="{{ message.id }}">
+      <a href="{% url 'user-details' message.user.id %}">{{ message.user }}</a> : 
+      <a href="{% url 'general-chat' %}?focused_message={{ message.id }}">{{ message.text }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<script>
+  // Check if focused_message param is present in the URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const focusedMessageId = urlParams.get('focused_message');
+
+  // If focused_message param is present, scroll to the corresponding message
+  if (focusedMessageId) {
+    const focusedMessage = document.getElementById(focusedMessageId);
+    if (focusedMessage) {
+      focusedMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+</script>
+{% endblock %}

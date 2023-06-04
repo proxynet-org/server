@@ -1,0 +1,17 @@
+{% extends 'web/base.html' %}
+{% load static %}
+
+{% block title %}Proxynet - Chatrooms{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h5>Chatrooms to Join</h5>
+  <ul class="list-group">
+    {% for chatroom in chatrooms %}
+    <li class="list-group-item">
+      <a class="btn btn-link" href="{% url 'chatroom-details' chatroom.id %}">{{ chatroom.name }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

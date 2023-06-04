@@ -1,0 +1,23 @@
+{% extends 'web/base.html' %}
+{% load static %}
+
+{% block title %}Proxynet - Chatroom{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    {% for message in messages %}
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">
+            <a href="{% url 'user-details' message.user.id %}">{{ message.user }} </a> : {{ message.text }}</h5>
+          <p class="card-text">{{ message.created_at }}</p>
+          <a href="{% url 'general-chat' %}?focused_message={{ message.id }}" class="btn btn-primary">View conversation</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

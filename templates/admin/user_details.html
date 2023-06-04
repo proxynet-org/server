@@ -7,6 +7,13 @@
 <body>
   <div class="container">
     <!-- User Details -->
+
+  <a class="btn btn-link" href="{% url 'users' %}">
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+    <path fill-rule="evenodd" d="M5.646 8l3.853-3.854a.5.5 0 1 0-.708-.708l-4.002 4a.5.5 0 0 0 0 .708l4.002 4a.5.5 0 0 0 .708-.708L5.646 8z"/>
+  </svg>
+  Back
+  </a>
     <div class="card mt-5">
       <div class="card-header">
         <h2>User Details</h2>
@@ -15,11 +22,12 @@
         <ul class="list-group">
           <li class="list-group-item"><strong>ID:</strong> {{ user.id }}</li>
           <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
-          <li class="list-group-item"><strong>User Hash:</strong> {{ user.hash }}</li>
+          <li class="list-group-item"><strong>User Hash:</strong> {{ user.userHash }}</li>
           <li class="list-group-item"><strong>First Name:</strong> {{ user.first_name }}</li>
           <li class="list-group-item"><strong>Last Name:</strong> {{ user.last_name }}</li>
           <li class="list-group-item"><strong>Created At:</strong> {{ user.created_at }}</li>
           <li class="list-group-item"><strong>Updated At:</strong> {{ user.updated_at }}</li>
+          <li class="list-group-item"><strong>Position :</strong> <a href="https://www.google.com/maps/search/?api=1&query={{ user.coordinates.latitude }},{{ user.coordinates.longitude }}" target="_blank"> {{ user.coordinates.latitude }}, {{ user.coordinates.longitude }}</a></li>
           {% if user.is_banned %}
             {% if ban_definite %}
             <li class="list-group-item text-danger"><strong>Warning:</strong> This user is banned forever </li>
@@ -72,27 +80,30 @@
     <div class="tab-content" id="messageTabsContent">
       <!-- General Server Messages -->
       <div class="tab-pane fade show active" id="general-server" role="tabpanel" aria-labelledby="general-server-tab">
-        <h3>Messages on General Server</h3>
+        <h5>Messages on General Server</h5>
         <ul class="list-group">
           {% for message in messages %}
-            <li class="list-group-item">{{ message }}</li>
+            <span style="font-weight: bold;">{{ user.first_name }} : {{ message.text }}</span>
+            <small style="float: right;">{{ message.created_at }}</small>
           {% endfor %}
         </ul>
       </div>
 
       <!-- Chatroom Messages -->
       <div class="tab-pane fade" id="chatrooms" role="tabpanel" aria-labelledby="chatrooms-tab">
-        <h3>Messages in Chatrooms</h3>
+        <h5>Chatrooms this user interacted with</h5>
         <ul class="list-group">
           {% for chatroom in chatrooms %}
-            <li class="list-group-item">{{ chatroom.name }}: {{ chatroom.message }}</li>
+          <li class="list-group-item">
+            <a class="btn btn-link" href="{% url 'home' %}">Chatroom Name : {{ chatroom.name }}</a>
+          </li>
           {% endfor %}
         </ul>
       </div>
 
       <!-- Private Messages -->
       <div class="tab-pane fade" id="private-messages" role="tabpanel" aria-labelledby="private-messages-tab">
-        <h3>Private Messages between Friends</h3>
+        <h5>Private Messages between Friends</h5>
         <ul class="list-group">
           {% for friend in friends %}
             <li class="list-group-item">{{ friend.name }}: {{ friend.message }}</li>

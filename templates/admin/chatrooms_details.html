@@ -1,0 +1,76 @@
+{% extends 'web/base.html' %}
+{% load static %}
+
+{% block title %}Proxynet - Chatroom{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <a class="btn btn-link" href="{% url 'chatrooms' %}">
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+    <path fill-rule="evenodd" d="M5.646 8l3.853-3.854a.5.5 0 1 0-.708-.708l-4.002 4a.5.5 0 0 0 0 .708l4.002 4a.5.5 0 0 0 .708-.708L5.646 8z"/>
+  </svg>
+  Back
+  </a>
+  <div class="scroll-box" id="message-box">
+    {% for message in messages %}
+    <div class="message">{{message.user}} : {{ message }}</div>
+    <small style="float: right;">{{ message.created_at }}</small>
+    {% endfor %}
+  </div>
+</div>
+
+<input type="text" class="form-control mt-3" id="message-input" placeholder="Type a message">
+<button class="btn btn-primary mt-2" onclick="sendMessage()">Send</button>
+
+<script>
+  // WebSocket connection
+  const socket = new WebSocket('ws://localhost:8000/ws/chat/publication');
+
+  // Function to handle incoming messages
+  socket.onmessage = function(event) {
+    const message = JSON.parse(event.data);
+    const messageBox = document.getElementById('message-box');
+    const listItem = document.createElement('div');
+    listItem.className = 'message';
+    listItem.textContent = message.user + ' : ' + message.content;
+    const smallItem = document.createElement('small');
+    smallItem.style.float = 'right';
+    smallItem.textContent = message.created_at;
+    messageBox.appendChild(listItem);
+    messageBox.appendChild(smallItem);
+    scrollToBottom();
+  };
+
+  // Function to send a message
+  function sendMessage() {
+    const input = document.getElementById('message-input');
+    const message = input.value;
+    input.value = '';
+    socket.send(JSON.stringify({ content: message }));
+  }
+
+  // Scroll to the bottom of the message box
+  function scrollToBottom() {
+    const messageBox = document.getElementById('message-box');
+    messageBox.scrollTop = messageBox.scrollHeight;
+  }
+
+  // Scroll to the bottom on page load
+  window.onload = function() {
+    scrollToBottom();
+  };
+</script>
+
+<style>
+  .scroll-box {
+    height: 400px;
+    overflow-y: scroll;
+    border: 1px solid #ccc;
+    padding: 10px;
+  }
+
+  .message {
+    margin-bottom: 10px;
+  }
+</style>
+{% endblock %}

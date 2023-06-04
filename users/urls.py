@@ -16,6 +16,10 @@ urlpatterns = [
     path("users/", views.users, name="users"),
     path("users/<int:user_id>/", views.user_details, name="user-details"),
     path("users/<int:user_id>/block/", views.block_user, name="block-user"),
+    path("chatrooms/", views.chatrooms, name="chatrooms"),
+    path("chatrooms/<int:pk>/", views.chatroom_details, name="chatroom-details"),
+    path("general/", views.general_chatroom, name="general"),
+    path("general-chat/", views.general_chatroom_details, name="general-chat"),
     path("chat/", views.chat, name="chat"),
     path("chat/<str:room_name>/", views.room, name="room"),
 
