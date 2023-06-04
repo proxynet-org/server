@@ -59,28 +59,8 @@ class Publication(models.Model):
     def save(self, *args, **kwargs):
         if not self.id:
             self.created_at = timezone.now()
-            if self.image:
-                self.image = self.compressImage(self.image)
         self.updated_at = timezone.now()
-
         return super(Publication, self).save(*args, **kwargs)
-
-    def compressImage(self, image:models.ImageField):
-        # compress image
-        from PIL import Image
-        from io import BytesIO
-        from django.core.files.uploadedfile import InMemoryUploadedFile
-        import sys
-        import os
-
-        imageTemproary = Image.open(image)
-        outputIoStream = BytesIO()
-        imageTemproaryResized = imageTemproary.resize((1020, 573))
-        imageTemproary.save(outputIoStream , format='JPEG', quality=60)
-        outputIoStream.seek(0)
-        image = InMemoryUploadedFile(outputIoStream,'ImageField', "%s.jpg" %image.name.split('.')[0], 'image/jpeg', sys.getsizeof(outputIoStream), None)
-        return image
-
 
 class Comment(models.Model):
     is_reply = models.BooleanField(default=False)

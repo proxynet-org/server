@@ -10,11 +10,13 @@ from django.conf import settings
 import websocket
 from django.urls import reverse
 from django.db.models import Q
+from rest_framework.permissions import AllowAny
 
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    permission_classes = (IsAuthenticated,)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -122,11 +124,10 @@ class PublicationViewSet(viewsets.ModelViewSet):
         # get the publication
         publication = Publication.objects.get(id=publication_id)
         # return the publication
-        serializer = PublicationSerializer(publication, context={'user': request.user})
+        serializer = PublicationSerializer(publication, context={'user': request.user, 'request': request})
         return Response(serializer.data)
     
-    def list(self, request, *args, **kwargs):
-        # only show publications from users within 100km
+    def list(self, request):
         user = User.objects.get(id=request.user.id)
         publications = Publication.objects.all()
         publications_within_range = []
@@ -136,8 +137,8 @@ class PublicationViewSet(viewsets.ModelViewSet):
                 user.coordinates, publication.coordinates)
             if distance <= range:
                 publications_within_range.append(publication)
-        serializer = PublicationSerializer(publications_within_range, many=True, context={'user': user})
-        return Response(serializer.data)
+        serializer = PublicationSerializer(publications_within_range, many=True, context={'user': user, 'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def like(self, request, *args, **kwargs):
         # get the publication id from the url <int:pk>
@@ -154,7 +155,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
         if user in publication.dislikes.all():
             publication.dislikes.remove(user)
         # return the publication
-        serializer = PublicationSerializer(publication, context={'user': request.user})
+        serializer = PublicationSerializer(publication, context={'user': request.user, 'request': request})
         return Response(serializer.data)
     
     def dislike(self, request, *args, **kwargs):
@@ -172,7 +173,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
         if user in publication.likes.all():
             publication.likes.remove(user)
         # return the publication
-        serializer = PublicationSerializer(publication, context={'user': request.user})
+        serializer = PublicationSerializer(publication, context={'user': request.user, 'request': request})
         return Response(serializer.data)
 
     def list_comments(self, request, *args, **kwargs):
