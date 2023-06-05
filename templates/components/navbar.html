@@ -18,6 +18,11 @@
       <li class="nav-item {% if request.path == '/support/' %}active{% endif %}">
         <a class="nav-link" href="{% url 'support' %}">FAQ</a>
       </li>
+    </ul>
+  </div>
+
+  <ul class="navbar-nav ml-auto">
+    {% if user.is_authenticated %}
       <li class="nav-item {% if request.path == '/redoc/' %}active{% endif %}">
         <a class="nav-link" href="{% url 'redoc' %}">Redoc</a>
       </li>
@@ -27,11 +32,6 @@
       <li class="nav-item {% if request.path == '/admin/' %}active{% endif %}">
         <a class="nav-link" href="{% url 'admin:index' %}">Django Admin</a>
       </li>
-    </ul>
-  </div>
-
-  <ul class="navbar-nav ml-auto">
-    {% if user.is_authenticated %}
       <li class="nav-item {% if request.path == '/users/' %}active{% endif %}">
         <a class="nav-link" href="{% url 'users' %}">Users</a>
       </li>
