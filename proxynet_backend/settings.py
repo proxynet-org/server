@@ -17,7 +17,7 @@ import os
 # Settings to set up
 
 # WEBSOCKET_URL = 'ws://localhost:8000' the url is the same as your django app
-WEBSOCKET_URL = 'ws://localhost:8080'
+WEBSOCKET_URL = 'ws://proxynet.porus.dev'
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -35,7 +35,7 @@ MEDIA_URL = '/media/'
 SECRET_KEY = 'django-insecure-u2!=+r%v$3&&#p7eaya02*$r#xub8#(z46d&y=zpc^h1xk%cd6'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -94,6 +94,9 @@ LOGIN_REQUIRED_URLS_EXCEPTIONS = (
     r'/about/$',
     r'/privacy/$',
     r'/support/$',
+    # media
+    r'/media(.*)$',
+    r'/static(.*)$',
 )
 
 SIMPLE_JWT = {
