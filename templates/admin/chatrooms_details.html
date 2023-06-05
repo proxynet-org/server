@@ -13,14 +13,13 @@
   </a>
   <div class="scroll-box" id="message-box">
     {% for message in messages %}
-    <div class="message">{{message.user}} : {{ message }}</div>
+    <div class="message{% if message.user.id == focused_id %} text-danger{% endif %}">
+    <a href="{% url 'user-details' message.user.id %}">{{ message.user }}</a>: {{ message }}
+    </div>
     <small style="float: right;">{{ message.created_at }}</small>
     {% endfor %}
   </div>
 </div>
-
-<input type="text" class="form-control mt-3" id="message-input" placeholder="Type a message">
-<button class="btn btn-primary mt-2" onclick="sendMessage()">Send</button>
 
 <script>
   // WebSocket connection

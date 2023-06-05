@@ -95,8 +95,11 @@ def chatrooms(request):
 
 def chatroom_details(request, pk):
     chatroom = Chatroom.objects.get(id=pk)
+    focused_id = request.GET.get('focused_id')
+    if focused_id:
+        focused_id = int(focused_id)
     chatroom_messages = ChatroomMessages.objects.filter(chatroom=chatroom)
-    return render(request, "admin/chatrooms_details.html", {"chatroom": chatroom, "messages": chatroom_messages})
+    return render(request, "admin/chatrooms_details.html", {"chatroom": chatroom, "messages": chatroom_messages, "focused_id": focused_id})
 
 def general_chatroom(request):
     messages = Message.objects.all()
