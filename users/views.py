@@ -26,6 +26,9 @@ def home(request):
 def privacy(request):
     return render(request, "web/privacy.html")
 
+def support(request):
+    return render(request, "web/support.html")
+
 def about(request):
     return render(request, "web/about.html")
 
