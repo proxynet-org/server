@@ -7,6 +7,7 @@ services:
       - "8080:8080"
     networks:
       - mynetwork
+    restart: unless-stopped
 
   websocket:
     image: redis:5
@@ -14,18 +15,21 @@ services:
       - "6379:6379"
     networks:
       - mynetwork
+    restart: unless-stopped
 
   nginx-proxy-manager:
-    image: jlesage/nginx-proxy-manager
+    image: 'jc21/nginx-proxy-manager:latest'
     ports:
       - "80:80"
-      - "81:81"
+      - "8081:81"
       - "443:443"
     volumes:
       - ./nginx-proxy-manager/data:/config
       - ./nginx-proxy-manager/letsencrypt:/etc/letsencrypt
     networks:
       - mynetwork
+    restart: unless-stopped
 
 networks:
   mynetwork:
+
