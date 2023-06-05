@@ -83,7 +83,9 @@
         <h5>Messages on General Server</h5>
         <ul class="list-group">
           {% for message in messages %}
-            <span style="font-weight: bold;">{{ user.first_name }} : {{ message.text }}</span>
+            <span style="font-weight: bold;">{{ user.first_name }} : 
+              <a href="{% url 'general-chat' %}?focused_message={{ message.id }}">{{ message.text }}</a>
+            </span>
             <small style="float: right;">{{ message.created_at }}</small>
           {% endfor %}
         </ul>
@@ -105,8 +107,14 @@
       <div class="tab-pane fade" id="private-messages" role="tabpanel" aria-labelledby="private-messages-tab">
         <h5>Private Messages between Friends</h5>
         <ul class="list-group">
-          {% for friend in friends %}
-            <li class="list-group-item">{{ friend.name }}: {{ friend.message }}</li>
+          {% for message in private_messages %}
+          <li class="list-group-item">
+            <span style="font-weight: bold;">{{ user.first_name }} : 
+              {{ message.text }}
+            </span>
+            <small style="float: right;">sent on {{ message.created_at }}</small>
+            sent to user : <a href="{% url 'user-details' message.receiver.id %}">{{ message.receiver }}</a>
+          </li>
           {% endfor %}
         </ul>
       </div>

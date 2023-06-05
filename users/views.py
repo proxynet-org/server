@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from content.models import Message, Publication, Comment
+from content.models import Message, Publication, Comment, PrivateMessage
 from django.db.models import Q
 from zone.models import Chatroom, ChatroomMessages
 from content.utils import get_distance_from_two_coordinates
@@ -55,13 +55,13 @@ def user_details(request, user_id):
     chatrooms_of_user_id = user_chatroom_messages.values('chatroom').distinct()
     chatrooms_of_user = Chatroom.objects.filter(id__in=chatrooms_of_user_id)
 
-    friends = []
+    private_messages = PrivateMessage.objects.filter(sender=user)
     is_banned = user.is_banned()
     ban_definite = user.ban_duration == -1
     ban_duration = timedelta(days=user.ban_duration)  # Assuming user.ban_duration is the ban duration in days
     ban_until_date = timezone.now() + ban_duration
     ban_until_date_str = ban_until_date.strftime("%d %B %Y")
-    return render(request, "admin/user_details.html", {"user": user, "messages": messages, "chatrooms": chatrooms_of_user, "friends": friends, "is_banned": is_banned, "ban_date": ban_until_date_str, "ban_definite": ban_definite})
+    return render(request, "admin/user_details.html", {"user": user, "messages": messages, "chatrooms": chatrooms_of_user, "private_messages":private_messages, "is_banned": is_banned, "ban_date": ban_until_date_str, "ban_definite": ban_definite})
 
 def block_user(request ,user_id):
     if request.method == 'POST':
