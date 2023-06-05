@@ -23,6 +23,12 @@ def room(request, room_name):
 def home(request):
     return render(request, "web/home.html")
 
+def privacy(request):
+    return render(request, "web/privacy.html")
+
+def about(request):
+    return render(request, "web/about.html")
+
 def users(request):
     users = User.objects.all()
     return render(request, "admin/users.html", {"users": users})

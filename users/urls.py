@@ -13,6 +13,8 @@ urlpatterns = [
 
     # html views
     path("", views.home, name="home"),
+    path("privacy/", views.privacy, name="privacy"),
+    path("about/", views.about, name="about"),
     path("users/", views.users, name="users"),
     path("users/<int:user_id>/", views.user_details, name="user-details"),
     path("users/<int:user_id>/block/", views.block_user, name="block-user"),

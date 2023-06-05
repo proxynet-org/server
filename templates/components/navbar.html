@@ -10,7 +10,10 @@
         <a class="nav-link" href="{% url 'home' %}">Home</a>
       </li>
       <li class="nav-item {% if request.path == '/about/' %}active{% endif %}">
-        <a class="nav-link" href="{% url 'home' %}">About</a>
+        <a class="nav-link" href="{% url 'about' %}">About</a>
+      </li>
+      <li class="nav-item {% if request.path == '/privacy/' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'privacy' %}">Privacy</a>
       </li>
       <li class="nav-item {% if request.path == '/redoc/' %}active{% endif %}">
         <a class="nav-link" href="{% url 'redoc' %}">Redoc</a>
