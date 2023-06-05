@@ -5,8 +5,16 @@ services:
     build: .
     ports:
       - "8080:8080"
-      
+    networks:
+      - mynetwork
+
   websocket:
     image: redis:5
     ports:
       - "6379:6379"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+
