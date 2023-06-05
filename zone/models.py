@@ -35,6 +35,7 @@ class Chatroom(models.Model):
     description = models.TextField(blank=True, null=True)
     capacity = models.IntegerField(blank=True, null=True)
     current_users = models.ManyToManyField(User, related_name='current_users', blank=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner', blank=True, null=True)
     # lifetime is how long the chatroom will remain open
     lifetime = models.IntegerField(blank=True, null=True)
     is_open = models.BooleanField(default=True)

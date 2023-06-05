@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
 
+
 class User(AbstractUser):
     def _createHash():
         return hexlify(os.urandom(16))
@@ -40,6 +41,10 @@ class User(AbstractUser):
                     return True
             else:
                 return False
+
+    def delete(self, using=None, keep_parents=False):
+        return super().delete(using=using, keep_parents=keep_parents)
+
 
     def __str__(self):
         return self.username

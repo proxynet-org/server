@@ -28,6 +28,7 @@ class ChatroomViewSet(viewsets.ModelViewSet):
         data["capacity"] = int(request.data["capacity"])
         data["lifetime"] = int(request.data["lifetime"])
         data['coordinates'] = user.coordinates
+        data['owner'] = user
         self.perform_create(serializer)
 
         # return 201 status code
