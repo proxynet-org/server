@@ -93,6 +93,7 @@ LOGIN_REQUIRED_URLS_EXCEPTIONS = (
     # safe pages
     r'/about/$',
     r'/privacy/$',
+    r'/support/$',
 )
 
 SIMPLE_JWT = {

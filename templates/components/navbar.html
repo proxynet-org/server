@@ -15,6 +15,9 @@
       <li class="nav-item {% if request.path == '/privacy/' %}active{% endif %}">
         <a class="nav-link" href="{% url 'privacy' %}">Privacy</a>
       </li>
+      <li class="nav-item {% if request.path == '/support/' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'support' %}">FAQ</a>
+      </li>
       <li class="nav-item {% if request.path == '/redoc/' %}active{% endif %}">
         <a class="nav-link" href="{% url 'redoc' %}">Redoc</a>
       </li>
