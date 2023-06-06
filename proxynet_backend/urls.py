@@ -11,8 +11,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import LoginView, LogoutView
 
-from .views import CustomLoginView, login
+from .views import CustomLoginView, login, CustomTokenObtainPairView
 from django.views.static import serve 
+
 
 urlpatterns = [
     # admin page
@@ -30,7 +31,7 @@ urlpatterns = [
     path('api/schema/redoc/', SpectacularRedocView.as_view(template_name="web/redoc.html",url_name='schema'), name='redoc'),
 
     # token
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # login
