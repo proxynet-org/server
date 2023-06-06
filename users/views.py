@@ -21,7 +21,10 @@ def room(request, room_name):
     return render(request, "chat/room.html", {"room_name": room_name})
 
 def home(request):
-    return render(request, "web/home.html")
+    version = ""
+    with open("VERSION", "r") as f:
+        version = f.read()
+    return render(request, "web/home.html", {"version": version})
 
 def privacy(request):
     return render(request, "web/privacy.html")

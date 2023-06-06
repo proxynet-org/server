@@ -94,3 +94,20 @@ class TestChatroom(APITestCase):
         response = self.client_b.get(reverse('chatroom-messages',kwargs={'pk': chatroom_id}))
         self.assertEqual(len(response.json()),1) # one created
         self.assertEqual(response.json()[0]['text'],data['text'])
+
+        # user a creates a new chatroom
+        data = {
+            "name" : "test chatroom 2",
+            "description" : "test chatroom description 2",
+            "capacity" : 10,
+            "lifetime" : 10,
+        }
+
+        response = self.client_a.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json()['name'], data['name'])
+        self.assertEqual(response.json()['description'], data['description'])
+
+        # user a joins the new chatroom without leaving the previous one
+        response = self.client_a.post(reverse('chatroom-join',kwargs={'pk': response.json()['id']}))
+        self.assertEqual(response.status_code, 200)

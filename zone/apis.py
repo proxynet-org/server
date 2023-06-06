@@ -50,6 +50,12 @@ class ChatroomViewSet(viewsets.ModelViewSet):
 
     def join_chatroom(self, request, pk=None):
         user = User.objects.get(id=request.user.id)
+        if user.is_in_chatroom:
+            user.is_in_chatroom = False
+            chatroom = Chatroom.objects.get(current_users__id=user.id)
+            chatroom.current_users.remove(user)
+            chatroom.save()
+            user.save()
         user_coordinates = user.coordinates
         distance = get_distance_from_two_coordinates(user_coordinates, Chatroom.objects.get(id=pk).coordinates)
         chatroom = Chatroom.objects.get(id=pk)
