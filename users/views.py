@@ -73,9 +73,6 @@ def block_user(request ,user_id):
         ban_duration = request.POST.get('ban_duration')  
         definite_ban = request.POST.get('definite_ban')
         unblock = request.POST.get('unblock')
-        print("unblock", unblock)
-        print("definite_ban", definite_ban) 
-        print("ban_duration", ban_duration)
         if unblock == "true":
             user.ban_duration = 0
             user.ban_date = None
@@ -93,7 +90,6 @@ def block_user(request ,user_id):
 
 def chatrooms(request):
     chatrooms = Chatroom.objects.all()
-    print(chatrooms)
     return render(request, "admin/chatrooms.html", {"chatrooms": chatrooms})
 
 def chatroom_details(request, pk):

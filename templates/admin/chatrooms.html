@@ -5,11 +5,35 @@
 
 {% block content %}
 <div class="container mt-5">
-  <h5>Chatrooms to Join</h5>
-  <ul class="list-group">
+  <h5>Chatrooms</h5>
+    <ul class="list-group">
     {% for chatroom in chatrooms %}
     <li class="list-group-item">
-      <a class="btn btn-link" href="{% url 'chatroom-details' chatroom.id %}">{{ chatroom.name }}</a>
+      <div class="row">
+        <div class="col-md-2">
+          <img src="{{ chatroom.image.url }}" alt="Chatroom Image" class="img-thumbnail">
+        </div>
+        <div class="col-md-8">
+          <h6>{{ chatroom.name }}</h6>
+          <p>{{ chatroom.description }}</p>
+          <p>Capacity: {{ chatroom.capacity }}</p>
+          <p>Current Users: 
+            {% for user in chatroom.current_users.all %}
+              <a href="{% url 'user-details' user.id %}">{{ user }} </a> 
+            {% endfor %}
+          </p>
+          <p>Owner: <a href="{% url 'user-details' chatroom.owner.id %}">{{ chatroom.owner }} </a></p>
+          {% if chatroom.is_available %}
+            <p>Chatroom is Available</p>
+          {% else %}
+            <p>Chatroom is Not Available</p>
+          {% endif %}
+          <p>Coordinates: <a href="https://maps.google.com/?q={{ chatroom.coordinates.latitude }},{{ chatroom.coordinates.longitude }}" target="_blank" class="btn btn-primary">View on Google Maps</a></p>
+        </div>
+        <div class="col-md-2">
+          <a class="btn btn-link" href="{% url 'chatroom-details' chatroom.id %}">Join</a>
+        </div>
+      </div>
     </li>
     {% endfor %}
   </ul>
