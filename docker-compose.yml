@@ -9,6 +9,7 @@ services:
       - mynetwork
     volumes:
       - ./db.sqlite3:/code/db.sqlite3
+      - ../mediafiles:/mediafiles
     restart: unless-stopped
 
   websocket:
