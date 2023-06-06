@@ -109,5 +109,5 @@ class TestChatroom(APITestCase):
         self.assertEqual(response.json()['description'], data['description'])
 
         # user a joins the new chatroom without leaving the previous one
-        response = self.client_a.post(reverse('chatroom-join',kwargs={'pk': response.json()['id']}))
+        response = self.client_a.post(reverse('chatroom-join',kwargs={'pk': 2}))
         self.assertEqual(response.status_code, 200)

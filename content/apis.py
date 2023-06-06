@@ -23,8 +23,8 @@ class MessageViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         data = serializer.validated_data
-        data['user'] = request.user
         user = User.objects.get(id=request.user.id)
+        data['user'] = user
         data['coordinates'] = user.coordinates
         self.perform_create(serializer)
 
@@ -96,8 +96,8 @@ class PublicationViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         data = serializer.validated_data
-        data['user'] = request.user
         user = User.objects.get(id=request.user.id)
+        data['user'] = user
         data['coordinates'] = user.coordinates
         self.perform_create(serializer)
 
