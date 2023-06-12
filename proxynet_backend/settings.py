@@ -17,7 +17,9 @@ import os
 # Settings to set up
 
 # WEBSOCKET_URL = 'ws://localhost:8000' the url is the same as your django app
-WEBSOCKET_URL = 'ws://proxynet.porus.dev'
+WEBSOCKET_URL = 'ws://57.128.39.162:8099'
+WEBSOCKET_ADMIN = 'admin'
+WEBSOCKET_PASSWORD = 'admin'
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

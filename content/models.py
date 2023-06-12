@@ -2,7 +2,9 @@ from django.db import models
 from django.utils import timezone
 from users.models import User
 from django.urls import reverse
-import websocket
+from proxynet_backend.proxynet_websocket import ProxynetWebsocket
+import asyncio
+from asgiref.sync import async_to_sync
 
 # Create your models here.
 
@@ -20,10 +22,23 @@ class Message(models.Model):
         return self.text
 
     def save(self, *args, **kwargs):
-        if not self.id:
-            self.created_at = timezone.now()
-        self.updated_at = timezone.now()
-        return super(Message, self).save(*args, **kwargs)
+        is_new = not self.pk
+        super().save(*args, **kwargs)
+        if is_new:
+            async_send_message = async_to_sync(self.send_message_async)
+            async_send_message()
+
+    async def send_message_async(self):
+        websocket = ProxynetWebsocket("all")
+        serialized_message = {"type": "message", "data":{
+            "id": self.id,
+            "user": self.user.id,
+            "text": self.text,
+            "coordinates": self.coordinates,
+            "created_at": str(self.created_at),
+            "updated_at": str(self.updated_at)
+        }}
+        await websocket.send_message(str(serialized_message))
 
 class PrivateMessage(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
