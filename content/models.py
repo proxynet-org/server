@@ -30,7 +30,7 @@ class Message(models.Model):
 
     async def send_message_async(self):
         websocket = ProxynetWebsocket("all")
-        serialized_message = {"type": "message", "data":{
+        serialized_message = {"type": "message", "datca":{
             "id": self.id,
             "user": self.user.id,
             "text": self.text,

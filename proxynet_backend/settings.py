@@ -77,6 +77,10 @@ CHANNEL_LAYERS = {
         },
     },
 }
+CHANNELS_WS_PROTOCOLS = [
+    'users.consumers.JWTAuthMiddleware',
+]
+
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
