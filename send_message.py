@@ -22,11 +22,12 @@ else:
     exit()
 
 # WebSocket connection details
-websocket_url = 'ws://localhost:8000/ws/chat/foo/'  # Replace with your WebSocket URL
+websocket_url = 'ws://localhost:8000/ws/chat/all/'  # Replace with your WebSocket URL
 
 # Message data
 message = {
-    'text': 'Hi my name is PORUS from Foo!',
+    'data': 'Hi my name is PORUS from Foo!',
+    'type':'message',
     'coordinates': {"altitude": 5, "heading": 0, "altitudeAccuracy": 0.4000000059604645, "latitude": 37.4219983, "speed": 0, "longitude": -122.084, "accuracy": 5}
 }
 

@@ -59,7 +59,8 @@ class ProxynetConsumer(WebsocketConsumer):
     def receive(self, text_data):
         # Called when a WebSocket frame is received.
         data = json.loads(text_data)
-        text = data.get('text')
+        text = data.get('data')
+        type = data.get('type')
         coordinates = data.get('coordinates')
 
         sender_id = self.get_user_id()
@@ -67,24 +68,54 @@ class ProxynetConsumer(WebsocketConsumer):
 
         # Find users within 2km radius
         users = UserInRoom.objects.filter(room=self.room_name)
-        self.send_message(sender.username, text, coordinates)
+        self.send_message(sender.username, text, coordinates, type)
 
-    def send_message(self, sender, text, coordinates):
+    def send_message(self, sender, text, coordinates, type):
         # Send message to a specific user
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
                 {
-                    'type': 'chat_message',
+                    'type': type,
                     'sender': sender,
-                    'text': text,
+                    'data': text,
                     'coordinates': coordinates
                 }
         )
 
+    def custom_send_message(self, room_name, sender, text, coordinates, type):
+        room_group_name = "chat_%s" % room_name
+        if not hasattr(self, 'channel_layer'):
+            from channels.layers import get_channel_layer
+            self.channel_layer = get_channel_layer()
+        async_to_sync(self.channel_layer.group_send)(
+            room_group_name,
+            {
+                'type': type,
+                'sender': sender,
+                'data': text,
+                'coordinates': coordinates
+            }
+        )
 
-    def chat_message(self, event):
+    def message(self, event):
+        self.proxy_event(event)
+
+    def chatroom(self, event):
+        self.proxy_event(event)
+
+    def publication(self, event):
+        self.proxy_event(event)
+    
+    def leave(self, event):
+        self.proxy_event(event)
+    
+    def join(self, event):
+        self.proxy_event(event)
+
+
+    def proxy_event(self, event):
         sender = event["sender"]
-        text = event["text"]
+        text = event["data"]
         coordinates = event["coordinates"]
 
         listener_user_id = self.get_user_id()
@@ -96,7 +127,8 @@ class ProxynetConsumer(WebsocketConsumer):
         # Send message to WebSocket
         self.send(text_data=json.dumps({
             'sender': sender,
-            'text': text
+            'data': text,
+            'coordinates': coordinates
         }))
 
     def get_user_id(self):

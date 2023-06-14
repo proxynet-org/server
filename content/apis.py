@@ -11,6 +11,7 @@ import websocket
 from django.urls import reverse
 from django.db.models import Q
 from rest_framework.permissions import AllowAny
+import asyncio
 
 
 class MessageViewSet(viewsets.ModelViewSet):

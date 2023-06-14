@@ -21,7 +21,6 @@ WEBSOCKET_URL = 'ws://57.128.39.162:8099'
 WEBSOCKET_ADMIN = 'admin'
 WEBSOCKET_PASSWORD = 'admin'
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 

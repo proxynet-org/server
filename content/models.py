@@ -3,8 +3,12 @@ from django.utils import timezone
 from users.models import User
 from django.urls import reverse
 from proxynet_backend.proxynet_websocket import ProxynetWebsocket
+from users.consumers import ProxynetConsumer
 import asyncio
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+import json
 
 # Create your models here.
 
@@ -22,23 +26,10 @@ class Message(models.Model):
         return self.text
 
     def save(self, *args, **kwargs):
-        is_new = not self.pk
-        super().save(*args, **kwargs)
-        if is_new:
-            async_send_message = async_to_sync(self.send_message_async)
-            async_send_message()
-
-    async def send_message_async(self):
-        websocket = ProxynetWebsocket("all")
-        serialized_message = {"type": "message", "datca":{
-            "id": self.id,
-            "user": self.user.id,
-            "text": self.text,
-            "coordinates": self.coordinates,
-            "created_at": str(self.created_at),
-            "updated_at": str(self.updated_at)
-        }}
-        await websocket.send_message(str(serialized_message))
+        if not self.id:
+            self.created_at = timezone.now()
+        self.updated_at = timezone.now()
+        return super(Message, self).save(*args, **kwargs)
 
 class PrivateMessage(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
@@ -96,3 +87,17 @@ class Comment(models.Model):
             self.created_at = timezone.now()
         self.updated_at = timezone.now()
         return super(Comment, self).save(*args, **kwargs)
+
+@receiver(post_save, sender=Message)
+def send_message_to_websocket(sender, instance, created, **kwargs):
+    if created:
+        user = instance.user
+        consumer = ProxynetConsumer()
+        message_dict = {
+            "user": user.id,
+            "text": instance.text,
+            "coordinates": instance.coordinates,
+            "created_at": str(instance.created_at),
+            "updated_at": str(instance.updated_at)
+        }
+        consumer.custom_send_message(room_name="all", sender=user.username, text=json.dumps(message_dict), coordinates=instance.coordinates, type="message")

@@ -22,7 +22,7 @@ else:
     exit()
 
 # WebSocket connection details
-websocket_url = 'ws://localhost:8000/ws/chat/foo/'  # Replace with your WebSocket URL
+websocket_url = 'ws://localhost:8000/ws/chat/all/'  # Replace with your WebSocket URL
 
 # Add JWT token to the request headers
 headers = {
