@@ -1,6 +1,12 @@
 from django.db import models
 from django.utils import timezone
 from users.models import User
+from django.urls import reverse
+from proxynet_backend.proxynet_websocket import ProxynetWebsocket
+from users.consumers import ProxynetConsumer
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+import json
 
 def chatroom_img_upload_to(instance, filename):
     return 'images/chatroom_files/{filename}'.format(filename=filename)
@@ -43,3 +49,14 @@ class Chatroom(models.Model):
     messages = models.ManyToManyField(ChatroomMessages, related_name='chatroom_messages', blank=True)
     coordinates = models.JSONField(blank=True, null=True)
     
+@receiver(post_save, sender=Chatroom)
+def send_chatroom_to_websocket(sender, instance, created, **kwargs):
+    if created:
+        from zone.serializers import ChatroomSerializer
+        from django.conf import settings
+        user = instance.user
+        consumer = ProxynetConsumer()
+        chatroom_serialized = ChatroomSerializer(instance).data
+        base_url = settings.BASE_URL
+        chatroom_serialized['image'] = base_url + chatroom_serialized['image']
+        consumer.custom_send_message(room_name="chatrooms", sender=user.userHash, text=chatroom_serialized, type="chatroom", coordinates=instance.coordinates)
