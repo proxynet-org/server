@@ -107,4 +107,4 @@ def send_publication_to_websocket(sender, instance, created, **kwargs):
         publication_serialized = PublicationSerializer(instance).data
         base_url = settings.BASE_URL
         publication_serialized['image'] = base_url + publication_serialized['image']
-        consumer.custom_send_message(room_name="all", sender=user.userHash, text=publication_serialized, type="publication", coordinates=instance.coordinates)
+        consumer.custom_send_message(room_name="publications", sender=user.userHash, text=publication_serialized, type="publication", coordinates=instance.coordinates)
