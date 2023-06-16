@@ -117,6 +117,7 @@ class ProxynetConsumer(WebsocketConsumer):
         sender = event["sender"]
         text = event["data"]
         coordinates = event["coordinates"]
+        type = event["type"]
 
         listener_user_id = self.get_user_id()
         listener_user = User.objects.get(id=listener_user_id)
@@ -128,6 +129,7 @@ class ProxynetConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'sender': sender,
             'data': text,
+            'type': type,
         }))
 
     def get_user_id(self):
