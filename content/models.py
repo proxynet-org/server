@@ -93,11 +93,5 @@ def send_message_to_websocket(sender, instance, created, **kwargs):
     if created:
         user = instance.user
         consumer = ProxynetConsumer()
-        message_dict = {
-            "user": user.id,
-            "text": instance.text,
-            "coordinates": instance.coordinates,
-            "created_at": str(instance.created_at),
-            "updated_at": str(instance.updated_at)
-        }
-        consumer.custom_send_message(room_name="all", sender=user.username, text=json.dumps(message_dict), coordinates=instance.coordinates, type="message")
+        message = instance.text
+        consumer.custom_send_message(room_name="all", sender=user.userHash, text=message, type="message", coordinates=instance.coordinates)

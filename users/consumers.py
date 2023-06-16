@@ -121,14 +121,13 @@ class ProxynetConsumer(WebsocketConsumer):
         listener_user_id = self.get_user_id()
         listener_user = User.objects.get(id=listener_user_id)
 
-        if get_distance_from_two_coordinates(coordinates, listener_user.coordinates) > settings.RADIUS_FOR_SEARCH or listener_user.username == sender:
+        if get_distance_from_two_coordinates(coordinates, listener_user.coordinates) > settings.RADIUS_FOR_SEARCH or listener_user.userHash == sender:
             return
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({
             'sender': sender,
             'data': text,
-            'coordinates': coordinates
         }))
 
     def get_user_id(self):
