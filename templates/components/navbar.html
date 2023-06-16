@@ -27,10 +27,11 @@
 
   <ul class="navbar-nav ml-auto">
     {% if user.is_authenticated %}
-      <li class="nav-item {% if request.path == '/api/schema/redoc/' %}active{% endif %}">
+      {% if user.is_superuser %}
+      <li class="nav-item {% if request.path == '/docs/redoc/' %}active{% endif %}">
         <a class="nav-link" href="{% url 'redoc' %}">Redoc</a>
       </li>
-      <li class="nav-item {% if request.path == '/api/schema/swagger-ui/' %}active{% endif %}">
+      <li class="nav-item {% if request.path == '/docs/swagger-ui/' %}active{% endif %}">
         <a class="nav-link" href="{% url 'swagger-ui' %}">Swagger</a>
       </li>
       <li class="nav-item {% if request.path == '/admin/' %}active{% endif %}">
@@ -48,6 +49,7 @@
       <li class="nav-item {% if request.path == '/general/' %}active{% endif %}">
         <a class="nav-link" href="{% url 'general' %}">General chat</a>
       </li>
+      {% endif %}
     {% endif %}
     {% if user.is_authenticated %}
     <li class="nav-item">

@@ -13,6 +13,9 @@ from django.contrib.auth.views import LoginView, LogoutView
 
 from .views import CustomLoginView, login, CustomTokenObtainPairView
 from django.views.static import serve 
+from django.contrib.admin.views.decorators import staff_member_required
+from users.views import protect_view
+
 
 
 urlpatterns = [
@@ -27,8 +30,8 @@ urlpatterns = [
     # docs
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     # Optional UI:
-    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(template_name="web/swagger.html",url_name='schema'), name='swagger-ui'),
-    path('api/schema/redoc/', SpectacularRedocView.as_view(template_name="web/redoc.html",url_name='schema'), name='redoc'),
+    path('docs/swagger-ui/', protect_view(SpectacularSwaggerView.as_view(template_name="web/swagger.html", url_name='schema')), name='swagger-ui'),
+    path('docs/redoc/', protect_view(SpectacularRedocView.as_view(template_name="web/redoc.html", url_name='schema')), name='redoc'),
 
     # token
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),

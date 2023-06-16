@@ -40,3 +40,4 @@ redis==4.5.4
 websocket-client==1.5.2
 django-ajax-datatable==4.4.5
 websockets==11.0.3
+python-dotenv==1.0.0

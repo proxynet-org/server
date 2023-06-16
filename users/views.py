@@ -9,8 +9,15 @@ from django.http import JsonResponse
 from django.utils import timezone
 from datetime import timedelta
 from django.conf import settings
+from django.http import HttpResponse
 
 
+def protect_view(view_func):
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_staff:
+            return HttpResponse("404 Not Found", status=401)
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 
 def chat(request):
@@ -35,10 +42,12 @@ def support(request):
 def about(request):
     return render(request, "web/about.html")
 
+@protect_view
 def users(request):
     users = User.objects.all()
     return render(request, "admin/users.html", {"users": users})
 
+@protect_view
 def search_users(request):
     query = request.GET.get('q')
     if query:
@@ -49,6 +58,7 @@ def search_users(request):
     user_list = [{'id': user.id, 'email': user.email, 'userHash': user.userHash, "first_name": user.first_name, "last_name":user.last_name, "created_at":user.created_at, "updated_at":user.updated_at} for user in users]
     return JsonResponse({'users': user_list})
 
+@protect_view
 def user_details(request, user_id):
     user = User.objects.get(id=user_id)
     messages = Message.objects.filter(user=user)
@@ -66,6 +76,7 @@ def user_details(request, user_id):
     ban_until_date_str = ban_until_date.strftime("%d %B %Y")
     return render(request, "admin/user_details.html", {"user": user, "messages": messages, "chatrooms": chatrooms_of_user, "private_messages":private_messages, "is_banned": is_banned, "ban_date": ban_until_date_str, "ban_definite": ban_definite})
 
+@protect_view
 def block_user(request ,user_id):
     if request.method == 'POST':
         user_id = request.POST.get('user_id')
@@ -88,10 +99,12 @@ def block_user(request ,user_id):
             user.save()
         return redirect('user-details', user_id=user_id) 
 
+@protect_view
 def chatrooms(request):
     chatrooms = Chatroom.objects.all()
     return render(request, "admin/chatrooms.html", {"chatrooms": chatrooms})
 
+@protect_view
 def chatroom_details(request, pk):
     chatroom = Chatroom.objects.get(id=pk)
     focused_id = request.GET.get('focused_id')
@@ -100,10 +113,12 @@ def chatroom_details(request, pk):
     chatroom_messages = ChatroomMessages.objects.filter(chatroom=chatroom)
     return render(request, "admin/chatrooms_details.html", {"chatroom": chatroom, "messages": chatroom_messages, "focused_id": focused_id})
 
+@protect_view
 def general_chatroom(request):
     messages = Message.objects.all()
     return render(request, "admin/general_chat.html", {"messages": messages})
 
+@protect_view
 def general_chatroom_details(request):
     message_list = Message.objects.all()
     focused_message = request.GET.get('focused_message')
@@ -114,10 +129,12 @@ def general_chatroom_details(request):
         messages = [message for message in message_list if get_distance_from_two_coordinates(message.coordinates, focused_message_coordinates) < settings.RADIUS_FOR_SEARCH]
     return render(request, "admin/general_chat_details.html", {"messages": messages, "focused_message": focused_message})
 
+@protect_view
 def publications(request):
     publications = Publication.objects.all()
     return render(request, "admin/publications.html", {"publications": publications})
 
+@protect_view
 def publication_details(request, pk):
     publication = Publication.objects.get(id=pk)
     comments = Comment.objects.filter(Q(publication=publication) & Q(is_reply=False))

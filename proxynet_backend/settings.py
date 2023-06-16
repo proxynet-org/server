@@ -13,13 +13,13 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Settings to set up
 
-# WEBSOCKET_URL = 'ws://localhost:8000' the url is the same as your django app
-WEBSOCKET_URL = 'ws://57.128.39.162:8099'
-WEBSOCKET_ADMIN = 'admin'
-WEBSOCKET_PASSWORD = 'admin'
+WEBSOCKET_URL = os.getenv('WEBSOCKET_URL', 'ws://localhost:8000/ws/chat/')
+WEBSOCKET_PORT = os.getenv('WEBSOCKET_PORT', 8000)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,7 +33,7 @@ MEDIA_URL = '/media/'
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-u2!=+r%v$3&&#p7eaya02*$r#xub8#(z46d&y=zpc^h1xk%cd6'
+SECRET_KEY = os.getenv('SECRET_KEY', 'changeme')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -72,7 +72,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("websocket", 6379)],
+            "hosts": [("websocket", WEBSOCKET_PORT)],
         },
     },
 }
