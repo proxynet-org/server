@@ -22,6 +22,8 @@ WEBSOCKET_URL = os.getenv('WEBSOCKET_URL', 'ws://localhost:8000/ws/chat/')
 WEBSOCKET_PORT = int(os.getenv('WEBSOCKET_PORT', 8000))
 WEBSOCKET_HOST = os.getenv('WEBSOCKET_HOST', '127.0.0.1')
 
+BASE_URL = os.getenv('BASE_URL', 'http://localhost:8000')
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
