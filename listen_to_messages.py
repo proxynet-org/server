@@ -41,4 +41,3 @@ while True:
 
 # Close the WebSocket connection
 ws.close()
-

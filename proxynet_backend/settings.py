@@ -19,7 +19,8 @@ load_dotenv()
 # Settings to set up
 
 WEBSOCKET_URL = os.getenv('WEBSOCKET_URL', 'ws://localhost:8000/ws/chat/')
-WEBSOCKET_PORT = os.getenv('WEBSOCKET_PORT', 8000)
+WEBSOCKET_PORT = int(os.getenv('WEBSOCKET_PORT', 8000))
+WEBSOCKET_HOST = os.getenv('WEBSOCKET_HOST', '127.0.0.1')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -36,7 +37,7 @@ MEDIA_URL = '/media/'
 SECRET_KEY = os.getenv('SECRET_KEY', 'changeme')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
@@ -72,10 +73,16 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("websocket", WEBSOCKET_PORT)],
+            "hosts": [(WEBSOCKET_HOST, int(WEBSOCKET_PORT))],
         },
     },
 }
+if DEBUG:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }
 CHANNELS_WS_PROTOCOLS = [
     'users.consumers.JWTAuthMiddleware',
 ]
