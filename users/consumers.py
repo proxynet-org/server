@@ -9,6 +9,7 @@ from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from users.models import User, UserInRoom
 from django.conf import settings
 
+
 class JWTAuthMiddleware(BaseMiddleware):
     """
     Middleware to authenticate WebSocket connections using JWT.
@@ -19,7 +20,7 @@ class JWTAuthMiddleware(BaseMiddleware):
         self.authenticator = JWTAuthentication()
 
     async def __call__(self, scope, receive, send):
-        scope['user'] = await self.authenticator.authenticate(scope)
+        scope["user"] = await self.authenticator.authenticate(scope)
         return await super().__call__(scope, receive, send)
 
 
@@ -32,17 +33,9 @@ class ProxynetConsumer(WebsocketConsumer):
 
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
-        self.room_group_name, self.channel_name
+            self.room_group_name, self.channel_name
         )
-            
-        user_id = self.get_user_id()
-        user = User.objects.get(id=user_id)
-        user_in_room = UserInRoom.objects.filter(user=user, room=self.room_name)
-        if not user_in_room.exists():
-            user_in_room = UserInRoom(user=user, room=self.room_name)
-            user_in_room.save()
 
-            
         self.accept()  # Accept the WebSocket connection.
 
     def disconnect(self, close_code):
@@ -50,18 +43,13 @@ class ProxynetConsumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name, self.channel_name
         )
-        user_id = self.get_user_id()
-        user = User.objects.get(id=user_id)
-        user_in_room = UserInRoom.objects.filter(user=user, room=self.room_name)
-        if user_in_room.exists():
-            user_in_room.delete()
 
     def receive(self, text_data):
         # Called when a WebSocket frame is received.
         data = json.loads(text_data)
-        text = data.get('data')
-        type = data.get('type')
-        coordinates = data.get('coordinates')
+        text = data.get("data")
+        type = data.get("type")
+        coordinates = data.get("coordinates")
 
         sender_id = self.get_user_id()
         sender = User.objects.get(id=sender_id)
@@ -74,27 +62,18 @@ class ProxynetConsumer(WebsocketConsumer):
         # Send message to a specific user
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
-                {
-                    'type': type,
-                    'sender': sender,
-                    'data': text,
-                    'coordinates': coordinates
-                }
+            {"type": type, "sender": sender, "data": text, "coordinates": coordinates},
         )
 
     def custom_send_message(self, room_name, sender, text, coordinates, type):
         room_group_name = "chat_%s" % room_name
-        if not hasattr(self, 'channel_layer'):
+        if not hasattr(self, "channel_layer"):
             from channels.layers import get_channel_layer
+
             self.channel_layer = get_channel_layer()
         async_to_sync(self.channel_layer.group_send)(
             room_group_name,
-            {
-                'type': type,
-                'sender': sender,
-                'data': text,
-                'coordinates': coordinates
-            }
+            {"type": type, "sender": sender, "data": text, "coordinates": coordinates},
         )
 
     def message(self, event):
@@ -105,13 +84,12 @@ class ProxynetConsumer(WebsocketConsumer):
 
     def publication(self, event):
         self.proxy_event(event)
-    
+
     def leave(self, event):
         self.proxy_event(event)
-    
+
     def join(self, event):
         self.proxy_event(event)
-
 
     def proxy_event(self, event):
         sender = event["sender"]
@@ -122,15 +100,23 @@ class ProxynetConsumer(WebsocketConsumer):
         listener_user_id = self.get_user_id()
         listener_user = User.objects.get(id=listener_user_id)
 
-        if get_distance_from_two_coordinates(coordinates, listener_user.coordinates) > settings.RADIUS_FOR_SEARCH or listener_user.userHash == sender:
+        if (
+            get_distance_from_two_coordinates(coordinates, listener_user.coordinates)
+            > settings.RADIUS_FOR_SEARCH
+            or listener_user.userHash == sender
+        ):
             return
 
         # Send message to WebSocket
-        self.send(text_data=json.dumps({
-            'sender': sender,
-            'data': text,
-            'type': type,
-        }))
+        self.send(
+            text_data=json.dumps(
+                {
+                    "sender": sender,
+                    "data": text,
+                    "type": type,
+                }
+            )
+        )
 
     def get_user_id(self):
         try:
@@ -144,7 +130,7 @@ class ProxynetConsumer(WebsocketConsumer):
             # Get user from JWT
             try:
                 validated_token = JWTAuthentication().get_validated_token(auth)
-                user_id = validated_token['user_id']
+                user_id = validated_token["user_id"]
             except InvalidToken:
                 return False
             except TokenError:
@@ -154,7 +140,7 @@ class ProxynetConsumer(WebsocketConsumer):
                 return False
 
             return user_id
-            
+
         except Exception as e:
             print(e)
             return False
