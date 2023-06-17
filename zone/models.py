@@ -63,18 +63,21 @@ class Chatroom(models.Model):
 @receiver(post_save, sender=Chatroom)
 def send_chatroom_to_websocket(sender, instance, created, **kwargs):
     if created:
-        from zone.serializers import ChatroomSerializer
-        from django.conf import settings
+        action_type = "post"
+    else:
+        action_type = "update"
+    from zone.serializers import ChatroomSerializer
+    from django.conf import settings
 
-        user = instance.owner
-        consumer = ProxynetConsumer()
-        chatroom_serialized = ChatroomSerializer(instance).data
-        base_url = settings.BASE_URL
-        chatroom_serialized["image"] = base_url + chatroom_serialized["image"]
-        consumer.custom_send_message(
-            room_name="chatrooms",
-            sender=user.userHash,
-            text=chatroom_serialized,
-            type="chatroom",
-            coordinates=instance.coordinates,
-        )
+    user = instance.owner
+    consumer = ProxynetConsumer()
+    chatroom_serialized = ChatroomSerializer(instance).data
+    base_url = settings.BASE_URL
+    chatroom_serialized["image"] = base_url + instance.image.url
+    consumer.custom_send_message(
+        room_name="chatrooms",
+        sender=user.userHash,
+        text=chatroom_serialized,
+        type=action_type,
+        coordinates=instance.coordinates,
+    )
