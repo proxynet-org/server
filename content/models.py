@@ -7,7 +7,7 @@ from users.consumers import ProxynetConsumer
 import asyncio
 from asgiref.sync import async_to_sync, sync_to_async
 from django.dispatch import receiver
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 import json
 
 # Create your models here.
@@ -113,7 +113,8 @@ def send_message_to_websocket(sender, instance, created, **kwargs):
         room_name="all",
         sender=user.userHash,
         text=message,
-        type=action_type,
+        type="message",
+        action_type=action_type,
         coordinates=instance.coordinates,
     )
 
@@ -124,7 +125,6 @@ def send_publication_to_websocket(sender, instance, created, **kwargs):
         action_type = "post"
     else:
         action_type = "update"
-
     from content.serializers import PublicationSerializer
     from django.conf import settings
 
@@ -132,11 +132,54 @@ def send_publication_to_websocket(sender, instance, created, **kwargs):
     consumer = ProxynetConsumer()
     publication_serialized = PublicationSerializer(instance).data
     base_url = settings.BASE_URL
-    publication_serialized["image"] = base_url + instance.image.url
+    try:
+        publication_serialized["image"] = base_url + instance.image.url
+    except:
+        publication_serialized["image"] = None
     consumer.custom_send_message(
         room_name="publications",
         sender=user.userHash,
         text=publication_serialized,
-        type=action_type,
+        type="publication",
+        action_type=action_type,
+        coordinates=instance.coordinates,
+    )
+
+@receiver(post_delete, sender=Message)
+def send_message_deleted_to_websocket(sender, instance, **kwargs):
+    from zone.serializers import ChatroomSerializer
+    from django.conf import settings
+
+    user = instance.owner
+    consumer = ProxynetConsumer()
+    message_serialized = ChatroomSerializer(instance).data
+    consumer.custom_send_message(
+        room_name="all",
+        sender=user.userHash,
+        text=message,
+        type="message",
+        action_type="delete",
+        coordinates=instance.coordinates,
+    )
+
+@receiver(post_delete, sender=Publication)
+def send_publication_deleted_to_websocket(sender, instance, **kwargs):
+    from content.serializers import PublicationSerializer
+    from django.conf import settings
+
+    user = instance.user
+    consumer = ProxynetConsumer()
+    publication_serialized = PublicationSerializer(instance).data
+    base_url = settings.BASE_URL
+    try:
+        publication_serialized["image"] = base_url + instance.image.url
+    except:
+        publication_serialized["image"] = None
+    consumer.custom_send_message(
+        room_name="publications",
+        sender=user.userHash,
+        text=publication_serialized,
+        type="publication",
+        action_type="delete",
         coordinates=instance.coordinates,
     )

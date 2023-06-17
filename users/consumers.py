@@ -36,6 +36,13 @@ class ProxynetConsumer(WebsocketConsumer):
             self.room_group_name, self.channel_name
         )
 
+        user_id = self.get_user_id()
+        user = User.objects.get(id=user_id)
+        user_in_room = UserInRoom.objects.filter(user=user, room=self.room_name)
+        if not user_in_room.exists():
+            user_in_room = UserInRoom(user=user, room=self.room_name)
+            user_in_room.save()
+
         self.accept()  # Accept the WebSocket connection.
 
     def disconnect(self, close_code):
@@ -43,12 +50,18 @@ class ProxynetConsumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name, self.channel_name
         )
+        user_id = self.get_user_id()
+        user = User.objects.get(id=user_id)
+        user_in_room = UserInRoom.objects.filter(user=user, room=self.room_name)
+        if user_in_room.exists():
+            user_in_room.delete()
 
     def receive(self, text_data):
         # Called when a WebSocket frame is received.
         data = json.loads(text_data)
         text = data.get("data")
         type = data.get("type")
+        action_type = date.get("action_type")
         coordinates = data.get("coordinates")
 
         sender_id = self.get_user_id()
@@ -56,16 +69,24 @@ class ProxynetConsumer(WebsocketConsumer):
 
         # Find users within 2km radius
         users = UserInRoom.objects.filter(room=self.room_name)
-        self.send_message(sender.username, text, coordinates, type)
+        self.send_message(sender.username, text, coordinates, type, action_type)
 
-    def send_message(self, sender, text, coordinates, type):
+    def send_message(self, sender, text, coordinates, type, action_type):
         # Send message to a specific user
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
-            {"type": type, "sender": sender, "data": text, "coordinates": coordinates},
+            {
+                "type": type,
+                "action_type": action_type,
+                "sender": sender,
+                "data": text,
+                "coordinates": coordinates,
+            },
         )
 
-    def custom_send_message(self, room_name, sender, text, coordinates, type):
+    def custom_send_message(
+        self, room_name, sender, text, coordinates, type, action_type
+    ):
         room_group_name = "chat_%s" % room_name
         if not hasattr(self, "channel_layer"):
             from channels.layers import get_channel_layer
@@ -73,7 +94,13 @@ class ProxynetConsumer(WebsocketConsumer):
             self.channel_layer = get_channel_layer()
         async_to_sync(self.channel_layer.group_send)(
             room_group_name,
-            {"type": type, "sender": sender, "data": text, "coordinates": coordinates},
+            {
+                "type": type,
+                "action_type": action_type,
+                "sender": sender,
+                "data": text,
+                "coordinates": coordinates,
+            },
         )
 
     def message(self, event):
@@ -96,6 +123,7 @@ class ProxynetConsumer(WebsocketConsumer):
         text = event["data"]
         coordinates = event["coordinates"]
         type = event["type"]
+        action_type = event["action_type"]
 
         listener_user_id = self.get_user_id()
         listener_user = User.objects.get(id=listener_user_id)
@@ -114,6 +142,7 @@ class ProxynetConsumer(WebsocketConsumer):
                     "sender": sender,
                     "data": text,
                     "type": type,
+                    "action_type": action_type,
                 }
             )
         )

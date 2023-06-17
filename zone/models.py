@@ -5,7 +5,7 @@ from django.urls import reverse
 from proxynet_backend.proxynet_websocket import ProxynetWebsocket
 from users.consumers import ProxynetConsumer
 from django.dispatch import receiver
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 import json
 
 
@@ -73,11 +73,37 @@ def send_chatroom_to_websocket(sender, instance, created, **kwargs):
     consumer = ProxynetConsumer()
     chatroom_serialized = ChatroomSerializer(instance).data
     base_url = settings.BASE_URL
-    chatroom_serialized["image"] = base_url + instance.image.url
+    try:
+        chatroom_serialized["image"] = base_url + instance.image.url
+    except:
+        chatroom_serialized["image"] = None
     consumer.custom_send_message(
         room_name="chatrooms",
         sender=user.userHash,
         text=chatroom_serialized,
-        type=action_type,
+        type="chatroom",
+        action_type=action_type,
+        coordinates=instance.coordinates,
+    )
+
+@receiver(post_delete, sender=Chatroom)
+def send_chatroom_deleted_to_websocket(sender, instance, **kwargs):
+    from zone.serializers import ChatroomSerializer
+    from django.conf import settings
+
+    user = instance.owner
+    consumer = ProxynetConsumer()
+    chatroom_serialized = ChatroomSerializer(instance).data
+    base_url = settings.BASE_URL
+    try:
+        chatroom_serialized["image"] = base_url + instance.image.url
+    except:
+        chatroom_serialized["image"] = None
+    consumer.custom_send_message(
+        room_name="chatrooms",
+        sender=user.userHash,
+        text=chatroom_serialized,
+        type="chatroom",
+        action_type="delete",
         coordinates=instance.coordinates,
     )
