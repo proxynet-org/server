@@ -80,11 +80,12 @@ CHANNEL_LAYERS = {
         },
     },
 }
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-    },
-}
+if DEBUG:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }
 CHANNELS_WS_PROTOCOLS = [
     "users.consumers.JWTAuthMiddleware",
 ]
