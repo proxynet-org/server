@@ -22,6 +22,11 @@
       <li class="nav-item {% if request.path == '/support/' %}active{% endif %}">
         <a class="nav-link" href="{% url 'support' %}">FAQ</a>
       </li>
+      {% if user.is_authenticated %} 
+      <li class="nav-item {% if request.path == '/messages-all/' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'messages-all' %}">Messages</a>
+      </li>
+      {% endif %}
     </ul>
   </div>
 

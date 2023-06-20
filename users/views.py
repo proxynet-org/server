@@ -144,7 +144,20 @@ def publication_details(request, pk):
 
 def messages_all_view(request):
     user = User.objects.get(id=request.user.id)
+    users = []
+    all_users = User.objects.all()
+    for u in all_users:
+        if get_distance_from_two_coordinates(u.coordinates, user.coordinates) < settings.RADIUS_FOR_SEARCH:
+            users.append(u)
+    if request.method == 'POST':
+        message = request.POST.get('message')
+        msg = Message.objects.create(user=user, text=message, coordinates=user.coordinates)
+        msg.save()
     refresh = RefreshToken.for_user(user)
     bearer = str(refresh.access_token)
     messages = Message.objects.all()
-    return render(request, "web-app/messages.html", {"messages": messages, "bearer": bearer})
+    user_messages = []
+    for message in messages:
+        if get_distance_from_two_coordinates(message.coordinates, user.coordinates) < settings.RADIUS_FOR_SEARCH:
+            user_messages.append(message)
+    return render(request, "web-app/messages.html", {"messages": messages, "bearer": bearer, "users":users})

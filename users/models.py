@@ -1,18 +1,24 @@
 import os
 from django.db import models
-from binascii import hexlify
 
 # Create a custom user model with location field
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+import random
+import string
 
 
+def createRandomString():
+    hash = ''.join(random.choice(string.ascii_lowercase) for i in range(6))
+    while User.objects.filter(userHash=hash).exists():
+        hash  = ''.join(random.choice(string.ascii_lowercase) for i in range(6))
+    return str(hash) 
 
 class User(AbstractUser):
     def _createHash():
-        return hexlify(os.urandom(16))
-    userHash = models.CharField(max_length=32, default=_createHash, unique=True, null=True)
+        return createRandomString()
+    userHash = models.CharField(max_length=32, default=createRandomString, unique=True)
     first_name = models.CharField(_("First name"), max_length=30, blank=False, null=False)
     last_name = models.CharField(_("Last name"), max_length=30, blank=False, null=False)
     email = models.EmailField(_("Email address"), blank=False, null=False)
@@ -48,6 +54,13 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    def change_user_hash(self):
+        string = createRandomString()
+        self.userHash = string
+        self.save()
+    
+
 
 
 class UserInRoom(models.Model):

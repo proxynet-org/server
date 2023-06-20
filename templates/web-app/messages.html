@@ -10,28 +10,174 @@
 
   socket.onmessage = function(event) {
     var message = JSON.parse(event.data);
-    var chatbox = document.getElementById('chatbox');
-    chatbox.innerHTML += "<p><strong>Sender: " + message.sender + "</strong> - " + message.data + "</p>";
+    var chatbox = document.getElementById('message-box');
+    chatbox.innerHTML += `
+    <div class="message">
+      ${message.sender} : ${message.data}
+    </div>
+    `;
+    scrollToBottom();
   };
 
-  function sendMessage() {
-    var messageInput = document.getElementById('messageInput');
-    var message = messageInput.value;
-    socket.send(message);
-    messageInput.value = '';
+  function scrollToBottom() {
+    const messageBox = document.getElementById('message-box');
+    messageBox.scrollTop = messageBox.scrollHeight;
   }
+
+  window.onload = function() {
+    scrollToBottom();
+  };
+
+
 </script>
 
 <body>
   <div class="container">
-    <h3>You are known as "{{ user.userHash }}"</h3>
-    <div id="chatbox"></div>
-    <div class="input-group mb-3">
-      <input id="messageInput" type="text" class="form-control" placeholder="Type your message...">
-      <div class="input-group-append">
-        <button class="btn btn-primary" type="button" onclick="sendMessage()">Send</button>
-      </div>
+    <h3 class="text-center">You are known as "{{ user.userHash }}"</h3>
+    <h6 class="text-center">You can speak to all the users that are 2km around you !</h6>
+    <div class="background">
+      <div class="radar" id="radar"></div>
     </div>
+    <div class="scroll-box" id="message-box">
+      {% for message in messages %}
+      <div class="message">
+        {{ message.user.userHash }} : {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+      <form method="post" action="{% url 'messages-all' %}" >
+        {% csrf_token %}
+        <div class="row">
+        <div class="col-md-10">
+          <input type="text" name="message" class="mytextbox form-control message-input" placeholder="Enter your message" required>
+        </div>
+        <div class="col">
+          <button type="submit" class="btn btn-primary">Send</button>
+        </div>
+      </div>
+      </form>
   </div>
 </body>
+
+
+<style>
+  .radar {
+      position: absolute;
+      top: 10%;
+      left: 1%;
+      width: 30vmin;
+      height: 30vmin;
+      background: repeating-radial-gradient(
+        transparent,
+        transparent 4.5%,
+        rgba(80, 255, 0, 0.35) 5%,
+        transparent 5.5%
+      )
+      content-box,
+      linear-gradient(
+        transparent 49.7%,
+        rgba(80, 255, 0, 0.2) 49.9%,
+        rgba(80, 255, 0, 0.2) 50.1%,
+        transparent 50.3%
+      )
+      content-box,
+      linear-gradient(
+        to right,
+        transparent 49.7%,
+        rgba(80, 255, 0, 0.2) 49.9%,
+        rgba(80, 255, 0, 0.2) 50.1%,
+        transparent 50.3%
+      )
+      content-box,
+      radial-gradient(#002500, #000500) content-box,
+      linear-gradient(to bottom right, #ccc, #666) border-box;
+      border: 2.5vmin solid transparent;
+      border-radius: 50%;
+      box-sizing: border-box;
+      overflow: hidden;
+      filter: drop-shadow(1vmin 1vmin 1vmin rgba(0, 0, 0, 0.4));
+    }
+
+    .radar::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: conic-gradient(transparent 90%, rgba(80, 255, 0, 0.35));
+      border-radius: 50%;
+      box-shadow: inset 0 0 2vmin rgba(0, 0, 0, 0.9);
+      animation: spin 2s linear infinite;
+    }
+
+    .radar__dot {
+      position: absolute;
+      width: 3%;
+      height: 3%;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: blink 2s ease-out infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(1turn);
+      }
+    }
+
+    @keyframes blink {
+      2%,
+      20% {
+        background-color: rgba(80, 255, 0, 0.85);
+        box-shadow: 0 0 1vmin rgba(80, 255, 0, 0.6);
+      }
+
+      90% {
+        background-color: transparent;
+      }
+    }
+  .scroll-box {
+    height: 400px;
+    overflow-y: scroll;
+    border: 1px solid #ccc;
+    padding: 10px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .message {
+    margin-bottom: 10px;
+  }
+
+  .background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  opacity: 0.5;
+  z-index: -1;
+}
+</style>
+<script>
+      const radar = document.getElementById("radar");
+
+    function createDot() {
+      const dot = document.createElement("div");
+      dot.className = "radar__dot";
+      
+      const randomTop = Math.random() * 50 + 20; // Random top position between 20% and 70%
+      const randomLeft = Math.random() * 60 + 20; // Random left position between 20% and 80%
+      const randomDelay = Math.random() * 1.5 + 0.25; // Random animation delay between 0.25s and 1.75s
+      
+      dot.style.top = `${randomTop}%`;
+      dot.style.left = `${randomLeft}%`;
+      dot.style.animationDelay = `${randomDelay}s`;
+      
+      radar.appendChild(dot);
+    }
+
+    {% for user in users %}
+      createDot();
+    {% endfor %}
+</script>
 {% endblock %}
