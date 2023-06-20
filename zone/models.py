@@ -108,3 +108,19 @@ def send_chatroom_deleted_to_websocket(sender, instance, **kwargs):
         action_type="delete",
         coordinates=instance.coordinates,
     )
+
+
+@receiver(post_save, sender=ChatroomMessages)
+def send_chatroom_message_to_websocket(sender, instance, **kwargs):
+    from zone.serializers import ChatroomMessagesSerializer
+
+    user = instance.user
+    consumer = ProxynetConsumer()
+    consumer.custom_send_message(
+        room_name=instance.chatroom.name + str(instance.chatroom.id),
+        sender=user.userHash,
+        text=instance.text,
+        type="chatroom_msg",
+        action_type="post",
+        coordinates=instance.coordinates,
+    )

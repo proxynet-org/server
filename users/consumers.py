@@ -103,6 +103,9 @@ class ProxynetConsumer(WebsocketConsumer):
     def chatroom(self, event):
         self.proxy_event(event)
 
+    def chatroom_msg(self, event):
+        self.proxy_event(event)
+
     def publication(self, event):
         self.proxy_event(event)
 
