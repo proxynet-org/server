@@ -59,7 +59,6 @@ class ProxynetConsumer(WebsocketConsumer):
         action_type = data.get("action_type")
         coordinates = data.get("coordinates")
 
-        import pdb; pdb.set_trace()
         # Find users within 2km radius
         # users = UserInRoom.objects.filter(room=self.room_name)
         sender_user_id = self.get_user_id()
@@ -120,6 +119,16 @@ class ProxynetConsumer(WebsocketConsumer):
         type = event["type"]
         action_type = event["action_type"]
 
+        listener_user_id = self.get_user_id()
+        listener_user = User.objects.get(id=listener_user_id)
+
+        if (
+            get_distance_from_two_coordinates(coordinates, listener_user.coordinates)
+            > settings.RADIUS_FOR_SEARCH
+            or listener_user.userHash == sender
+        ):
+            return
+
 
         # Send message to WebSocket
         self.send(
@@ -135,16 +144,10 @@ class ProxynetConsumer(WebsocketConsumer):
 
     def get_user_id(self):
         try:
-            headers = dict(self.scope["headers"])
-            auth = headers.get(b"authorization")
+            auth = self.scope['subprotocols']
+            auth = auth[0]
             if auth is None:
                 return
-            auth = auth.decode("utf-8")
-            auth = auth.split(" ")
-            auth = auth[1]
-            if auth is None:
-                return
-            auth = auth.decode("utf-8")
             try:
                 validated_token = JWTAuthentication().get_validated_token(auth)
                 user_id = validated_token["user_id"]

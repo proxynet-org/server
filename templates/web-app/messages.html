@@ -6,10 +6,12 @@
 {% block content %}
 <script>
   var token = "{{ bearer }}";
-  var socket = new WebSocket("ws://localhost:8000/ws/chat/all/");
+  var socket = new WebSocket("ws://localhost:8000/ws/chat/all/", token);
 
   socket.onmessage = function(event) {
-    console.log("Message Received: " + event.data);
+    var message = JSON.parse(event.data);
+    var chatbox = document.getElementById('chatbox');
+    chatbox.innerHTML += "<p><strong>Sender: " + message.sender + "</strong> - " + message.data + "</p>";
   };
 
   function sendMessage() {
