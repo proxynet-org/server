@@ -1,0 +1,35 @@
+{% extends 'web/base.html' %}
+{% load static %}
+
+{% block title %}Proxynet - Messages{% endblock %}
+
+{% block content %}
+<script>
+  var token = "{{ bearer }}";
+  var socket = new WebSocket("ws://localhost:8000/ws/chat/all/");
+
+  socket.onmessage = function(event) {
+    console.log("Message Received: " + event.data);
+  };
+
+  function sendMessage() {
+    var messageInput = document.getElementById('messageInput');
+    var message = messageInput.value;
+    socket.send(message);
+    messageInput.value = '';
+  }
+</script>
+
+<body>
+  <div class="container">
+    <h3>You are known as "{{ user.userHash }}"</h3>
+    <div id="chatbox"></div>
+    <div class="input-group mb-3">
+      <input id="messageInput" type="text" class="form-control" placeholder="Type your message...">
+      <div class="input-group-append">
+        <button class="btn btn-primary" type="button" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+</body>
+{% endblock %}

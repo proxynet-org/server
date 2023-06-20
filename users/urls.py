@@ -28,6 +28,8 @@ urlpatterns = [
     path("chat/", views.chat, name="chat"),
     path("chat/<str:room_name>/", views.room, name="room"),
 
+    path('messages-all/', views.messages_all_view, name='messages-all'),
+
     # data views
     path('users/search/', views.search_users, name='search-users'),
 ]

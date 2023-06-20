@@ -10,6 +10,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.conf import settings
 from django.http import HttpResponse
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 def protect_view(view_func):
@@ -140,3 +141,10 @@ def publication_details(request, pk):
     comments = Comment.objects.filter(Q(publication=publication) & Q(is_reply=False))
 
     return render(request, "admin/publication_details.html", {"publication": publication, "comments": comments})
+
+def messages_all_view(request):
+    user = User.objects.get(id=request.user.id)
+    refresh = RefreshToken.for_user(user)
+    bearer = str(refresh.access_token)
+    messages = Message.objects.all()
+    return render(request, "web-app/messages.html", {"messages": messages, "bearer": bearer})

@@ -86,6 +86,7 @@ def send_chatroom_to_websocket(sender, instance, created, **kwargs):
         coordinates=instance.coordinates,
     )
 
+
 @receiver(post_delete, sender=Chatroom)
 def send_chatroom_deleted_to_websocket(sender, instance, **kwargs):
     from zone.serializers import ChatroomSerializer
