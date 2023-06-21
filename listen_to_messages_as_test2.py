@@ -26,7 +26,7 @@ headers = {"Authorization": f"Bearer {jwt_token}"}
 
 # Establish WebSocket connection and send message
 ws = websocket.WebSocket()
-ws.connect(websocket_url)
+ws.connect(websocket_url, header=headers)
 
 # Receive and print the response from the WebSocket server
 print("Listening for messages:")

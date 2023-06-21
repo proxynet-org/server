@@ -73,15 +73,6 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = "users.User"
 ASGI_APPLICATION = "proxynet_backend.asgi.application"
 CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [(WEBSOCKET_HOST, int(WEBSOCKET_PORT))],
-        },
-    },
-}
-if DEBUG:
-    CHANNEL_LAYERS = {
         "default": {
             "BACKEND": "channels.layers.InMemoryChannelLayer",
         },

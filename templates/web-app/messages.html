@@ -6,7 +6,12 @@
 {% block content %}
 <script>
   var token = "{{ bearer }}";
-  var socket = new WebSocket("ws://localhost:8000/ws/chat/all/", token);
+  try {
+    var socket = new WebSocket("{{ websocket_url }}all/?token=" + token);
+  } catch (error) {
+    console.log("Websocket connection failed :(")
+    console.log(error);
+  }
 
   socket.onmessage = function(event) {
     var message = JSON.parse(event.data);
@@ -17,6 +22,11 @@
     </div>
     `;
     scrollToBottom();
+  };
+
+  socket.onclose = function(event) {
+    console.log("Websocket connection closed :(")
+    console.log(event);
   };
 
   function scrollToBottom() {
@@ -62,9 +72,10 @@
 
 <style>
   .radar {
-      position: absolute;
-      top: 10%;
-      left: 1%;
+      position: fixed;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
       width: 30vmin;
       height: 30vmin;
       background: repeating-radial-gradient(
@@ -153,7 +164,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #000;
+  background-color: white;
   opacity: 0.5;
   z-index: -1;
 }

@@ -157,7 +157,8 @@ def messages_all_view(request):
     bearer = str(refresh.access_token)
     messages = Message.objects.all()
     user_messages = []
+    websocket_url = settings.WEBSOCKET_URL
     for message in messages:
         if get_distance_from_two_coordinates(message.coordinates, user.coordinates) < settings.RADIUS_FOR_SEARCH:
             user_messages.append(message)
-    return render(request, "web-app/messages.html", {"messages": messages, "bearer": bearer, "users":users})
+    return render(request, "web-app/messages.html", {"messages": messages, "bearer": bearer, "users":users, "websocket_url": websocket_url})

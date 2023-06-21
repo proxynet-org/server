@@ -20,7 +20,7 @@ else:
 
 # WebSocket connection details
 websocket_url = (
-    "ws://57.128.39.162:8069/ws/chat/chatrooms/"  # Replace with your WebSocket URL
+    "ws://57.128.39.162:8069/ws/chat/all/"  # Replace with your WebSocket URL
 )
 
 # Add JWT token to the request headers

@@ -1,5 +1,5 @@
 import json
-
+import jwt
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from content.utils import get_distance_from_two_coordinates
@@ -31,25 +31,20 @@ class ProxynetConsumer(WebsocketConsumer):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = "chat_%s" % self.room_name
 
-
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name, self.channel_name
         )
-
-
         self.accept()  # Accept the WebSocket connection.
+        user_id = self.get_user_id()
+        print("User ID: ", user_id, " connected to room: ", self.room_name)
 
     def disconnect(self, close_code):
         # Called when the WebSocket closes for any reason.
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name, self.channel_name
         )
-        user_id = self.get_user_id()
-        user = User.objects.get(id=user_id)
-        user_in_room = UserInRoom.objects.filter(user=user, room=self.room_name)
-        if user_in_room.exists():
-            user_in_room.delete()
+        print("User ID: ", self.get_user_id(), " disconnected from room: ", self.room_name)
 
     def receive(self, text_data):
         # Called when a WebSocket frame is received.
@@ -147,21 +142,9 @@ class ProxynetConsumer(WebsocketConsumer):
 
     def get_user_id(self):
         try:
-            auth = self.scope['subprotocols']
-            auth = auth[0]
-            if auth is None:
-                return
-            try:
-                validated_token = JWTAuthentication().get_validated_token(auth)
-                user_id = validated_token["user_id"]
-            except InvalidToken:
-                return False
-            except TokenError:
-                return False
-            except Exception as e:
-                print("Token get_user_id exception :",e)
-                return False
-
+            auth = self.scope["query_string"].decode("utf-8").split("=")[1]
+            token_data = jwt.decode(auth, verify=False, algorithms=["HS256"], options={"verify_signature": False})
+            user_id = token_data["user_id"]
             return user_id
 
         except Exception as e:
