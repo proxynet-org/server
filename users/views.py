@@ -189,9 +189,10 @@ def password_reset(request):
                     print(response.status_code)
                     print(response.body)
                     print(response.headers)
+                    return render(request, 'web/password_reset.html', {"message": "If the email exists, you will receive a password reset link"})
                 except Exception as e:
                     print(e)
-    return render(request, 'web/password_reset.html', {"message": "Please check your email for the password reset link"})
+    return render(request, 'web/password_reset.html')
 
 def password_reset_confirm(request):
     if request.method == 'POST':
@@ -205,6 +206,8 @@ def password_reset_confirm(request):
                 user.set_password(password)
                 user.save()
                 return redirect('login')
+            else:
+                return render(request, 'web/password_reset_confirm.html', {"message": "Invalid token"})
         except Exception as e:
             print(e)
             return render(request, 'web/password_reset_confirm.html', {"message": "Invalid token"})
