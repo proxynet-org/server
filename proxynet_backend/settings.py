@@ -18,6 +18,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Settings to set up
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'apikey'
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", "changeme")
+DEFAULT_FROM_EMAIL = 'proxynet.dev@gmail.com'
+EMAIL_USE_TLS = True
+
 
 WEBSOCKET_URL = os.getenv("WEBSOCKET_URL", "ws://localhost:8000/ws/chat/")
 WEBSOCKET_PORT = int(os.getenv("WEBSOCKET_PORT", 8000))
@@ -101,6 +109,8 @@ LOGIN_REQUIRED_URLS_EXCEPTIONS = (
     # media
     r"/media(.*)$",
     r"/static(.*)$",
+    # password reset urls
+    r"^/password-reset(.*)$",
 )
 
 SIMPLE_JWT = {

@@ -30,6 +30,9 @@ urlpatterns = [
 
     path('messages-all/', views.messages_all_view, name='messages-all'),
 
+    path('password-reset/', views.password_reset, name='password-reset'),
+    path('password-reset-confirm/', views.password_reset_confirm, name='password-reset-confirm'),
+
     # data views
     path('users/search/', views.search_users, name='search-users'),
 ]

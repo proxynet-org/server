@@ -11,7 +11,10 @@ from datetime import timedelta
 from django.conf import settings
 from django.http import HttpResponse
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from django.contrib.auth.tokens import default_token_generator, PasswordResetTokenGenerator
+from django.core.mail import send_mail
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 def protect_view(view_func):
     def wrapper(request, *args, **kwargs):
@@ -161,3 +164,48 @@ def messages_all_view(request):
         if get_distance_from_two_coordinates(message.coordinates, user.coordinates) < settings.RADIUS_FOR_SEARCH:
             user_messages.append(message)
     return render(request, "web-app/messages.html", {"messages": messages, "bearer": bearer, "users":users, "websocket_url": websocket_url})
+
+def password_reset(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        if email:
+            user = User.objects.get(email=email)
+            if user:
+                try:
+                    token = PasswordResetTokenGenerator().make_token(user)
+                    url = request.build_absolute_uri('/')
+                    subject = 'Password Reset'
+                    reset_url = url + 'password-reset-confirm?token=' + token + '&uid=' + str(user.id)
+                    message = f'Please click the following link to reset your password: {reset_url}'
+                    from_email = 'proxynet.dev@gmail.com'
+                    recipient_list = [email]
+                    message = Mail(
+                    from_email='proxynet.dev@gmail.com',
+                    to_emails=email,
+                    subject='Password Reset',
+                    html_content=f'<strong>{message}</strong>')
+                    sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+                    response = sg.send(message)
+                    print(response.status_code)
+                    print(response.body)
+                    print(response.headers)
+                except Exception as e:
+                    print(e)
+    return render(request, 'web/password_reset.html', {"message": "Please check your email for the password reset link"})
+
+def password_reset_confirm(request):
+    if request.method == 'POST':
+        # get token from the query
+        try:
+            token = request.GET.get('token')
+            password = request.POST.get('password')
+            user_id = int(request.GET.get('uid'))
+            user = User.objects.get(id=user_id)
+            if user and PasswordResetTokenGenerator().check_token(user, token):
+                user.set_password(password)
+                user.save()
+                return redirect('login')
+        except Exception as e:
+            print(e)
+            return render(request, 'web/password_reset_confirm.html', {"message": "Invalid token"})
+    return render(request, 'web/password_reset_confirm.html')
