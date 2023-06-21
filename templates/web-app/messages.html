@@ -6,6 +6,7 @@
 {% block content %}
 <script>
   var token = "{{ bearer }}";
+  var baseUrl = window.location.origin;
   try {
     var socket = new WebSocket("{{ websocket_url }}all/?token=" + token);
   } catch (error) {
@@ -38,6 +39,39 @@
     scrollToBottom();
   };
 
+  function sendMessage() {
+    var message = document.querySelector('input[name="message"]').value;
+    fetch(baseUrl + "/api/messages/", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        text: message
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Handle response if needed
+    })
+    .catch(error => {
+      console.log("Error sending message:", error);
+    });
+
+    // Clear the input field
+    messageInput = document.querySelector('input[name="message"]');
+    messageInput.value = '';
+
+    var chatbox = document.getElementById('message-box');
+    chatbox.innerHTML += `
+    <div class="message">
+      {{ user.userHash }} : ${message}
+    </div>
+    `;
+    scrollToBottom();
+  }
+
 
 </script>
 
@@ -55,17 +89,14 @@
       </div>
       {% endfor %}
     </div>
-      <form method="post" action="{% url 'messages-all' %}" >
-        {% csrf_token %}
         <div class="row">
         <div class="col-md-10">
           <input type="text" name="message" class="mytextbox form-control message-input" placeholder="Enter your message" required>
         </div>
         <div class="col">
-          <button type="submit" class="btn btn-primary">Send</button>
+          <button type="submit" class="btn btn-primary" onclick="sendMessage()">Send</button>
         </div>
       </div>
-      </form>
   </div>
 </body>
 

@@ -19,14 +19,14 @@ else:
     exit()
 
 # WebSocket connection details
-websocket_url = "ws://localhost:8000/ws/chat/all/"  # Replace with your WebSocket URL
+websocket_url = "ws://localhost:8000/ws/chat/all/?token=" + jwt_token
 
 # Add JWT token to the request headers
 headers = {"Authorization": f"Bearer {jwt_token}"}
 
 # Establish WebSocket connection and send message
 ws = websocket.WebSocket()
-ws.connect(websocket_url, header=headers)
+ws.connect(websocket_url)
 
 # Receive and print the response from the WebSocket server
 print("Listening for messages:")

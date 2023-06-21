@@ -152,7 +152,6 @@ def messages_all_view(request):
     if request.method == 'POST':
         message = request.POST.get('message')
         msg = Message.objects.create(user=user, text=message, coordinates=user.coordinates)
-        msg.save()
     refresh = RefreshToken.for_user(user)
     bearer = str(refresh.access_token)
     messages = Message.objects.all()

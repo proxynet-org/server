@@ -20,7 +20,7 @@ else:
 
 # WebSocket connection details
 websocket_url = (
-    "ws://57.128.39.162:8069/ws/chat/all/"  # Replace with your WebSocket URL
+    "wss://test-proxynet.porus.dev/ws/chat/all/?token=" + jwt_token
 )
 
 # Add JWT token to the request headers
@@ -28,7 +28,7 @@ headers = {"Authorization": f"Bearer {jwt_token}"}
 
 # Establish WebSocket connection and send message
 ws = websocket.WebSocket()
-ws.connect(websocket_url, header=headers)
+ws.connect(websocket_url)
 
 # Receive and print the response from the WebSocket server
 print("Listening for messages:")
