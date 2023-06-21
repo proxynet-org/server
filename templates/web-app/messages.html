@@ -19,7 +19,7 @@
     var chatbox = document.getElementById('message-box');
     chatbox.innerHTML += `
     <div class="message">
-      ${message.sender} : ${message.data}
+      <span style="color: ${message.color}"> ${message.sender}</span> : ${message.data}
     </div>
     `;
     scrollToBottom();
@@ -41,6 +41,9 @@
 
   function sendMessage() {
     var message = document.querySelector('input[name="message"]').value;
+    if (message == "") {
+      return;
+    }
     fetch(baseUrl + "/api/messages/", {
       method: 'POST',
       headers: {
@@ -66,18 +69,30 @@
     var chatbox = document.getElementById('message-box');
     chatbox.innerHTML += `
     <div class="message">
-      {{ user.userHash }} : ${message}
+      <span style="color: {{ user.random_color }}">{{ user.userHash }}</span> : ${message}
     </div>
     `;
     scrollToBottom();
   }
 
 
+  document.addEventListener("DOMContentLoaded", function() {
+    // Event listener for the Enter key press
+    document.getElementById("message-input").addEventListener("keyup", function(event) {
+      // Check if the Enter key is pressed
+      if (event.keyCode === 13) {
+        // Call the sendMessage function
+        sendMessage();
+      }
+    });
+  });
+
+
 </script>
 
 <body>
   <div class="container">
-    <h3 class="text-center">You are known as "{{ user.userHash }}"</h3>
+    <h3 class="text-center">You are known as <span style="color: {{ user.random_color }}">"{{ user.userHash }}"</span></h3>
     <h6 class="text-center">You can speak to all the users that are 2km around you !</h6>
     <div class="background">
       <div class="radar" id="radar"></div>
@@ -85,13 +100,13 @@
     <div class="scroll-box" id="message-box">
       {% for message in messages %}
       <div class="message">
-        {{ message.user.userHash }} : {{ message }}
+        <span style="color: {{ message.user.random_color }}">{{ message.user.userHash }}</span> : {{ message }}
       </div>
       {% endfor %}
     </div>
         <div class="row">
         <div class="col-md-10">
-          <input type="text" name="message" class="mytextbox form-control message-input" placeholder="Enter your message" required>
+          <input id="message-input" type="text" name="message" class="mytextbox form-control message-input" placeholder="Enter your message" required>
         </div>
         <div class="col">
           <button type="submit" class="btn btn-primary" onclick="sendMessage()">Send</button>

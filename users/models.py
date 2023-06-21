@@ -1,5 +1,6 @@
 import os
 from django.db import models
+import random
 
 # Create a custom user model with location field
 from django.contrib.auth.models import AbstractUser
@@ -10,16 +11,39 @@ import string
 
 
 def createRandomString():
-    hash = ''.join(random.choice(string.ascii_lowercase) for i in range(6))
+    hash = "".join(random.choice(string.ascii_lowercase) for i in range(6))
     while User.objects.filter(userHash=hash).exists():
-        hash  = ''.join(random.choice(string.ascii_lowercase) for i in range(6))
-    return str(hash) 
+        hash = "".join(random.choice(string.ascii_lowercase) for i in range(6))
+    return str(hash)
+
+
+def _generate_random_color():
+    while True:
+        # generate random rgb values
+        r = random.randint(0, 255)
+        g = random.randint(0, 255)
+        b = random.randint(0, 255)
+
+        # calculate the perceived brightness of the color
+        brightness = (r * 299 + g * 587 + b * 114) / 1000
+
+        # check if the color is readable on a white background
+        if brightness > 125:
+            return f"#{r:02x}{g:02x}{b:02x}"
+
 
 class User(AbstractUser):
     def _createHash():
         return createRandomString()
+
+    def generate_random_color():
+        return _generate_random_color()
+
     userHash = models.CharField(max_length=32, default=createRandomString, unique=True)
-    first_name = models.CharField(_("First name"), max_length=30, blank=False, null=False)
+    random_color = models.CharField(max_length=7, default=generate_random_color)
+    first_name = models.CharField(
+        _("First name"), max_length=30, blank=False, null=False
+    )
     last_name = models.CharField(_("Last name"), max_length=30, blank=False, null=False)
     email = models.EmailField(_("Email address"), blank=False, null=False)
     coordinates = models.JSONField(blank=True, null=True)
@@ -51,16 +75,14 @@ class User(AbstractUser):
     def delete(self, using=None, keep_parents=False):
         return super().delete(using=using, keep_parents=keep_parents)
 
-
     def __str__(self):
         return self.username
 
     def change_user_hash(self):
         string = createRandomString()
         self.userHash = string
+        self.random_color = _generate_random_color()
         self.save()
-    
-
 
 
 class UserInRoom(models.Model):

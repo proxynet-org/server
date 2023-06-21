@@ -116,6 +116,7 @@ def send_message_to_websocket(sender, instance, created, **kwargs):
         type="message",
         action_type=action_type,
         coordinates=instance.coordinates,
+        color=user.random_color,
     )
 
 
@@ -143,7 +144,9 @@ def send_publication_to_websocket(sender, instance, created, **kwargs):
         type="publication",
         action_type=action_type,
         coordinates=instance.coordinates,
+        color=user.random_color,
     )
+
 
 @receiver(post_delete, sender=Message)
 def send_message_deleted_to_websocket(sender, instance, **kwargs):
@@ -160,7 +163,9 @@ def send_message_deleted_to_websocket(sender, instance, **kwargs):
         type="message",
         action_type="delete",
         coordinates=instance.coordinates,
+        color=user.random_color,
     )
+
 
 @receiver(post_delete, sender=Publication)
 def send_publication_deleted_to_websocket(sender, instance, **kwargs):
@@ -182,4 +187,5 @@ def send_publication_deleted_to_websocket(sender, instance, **kwargs):
         type="publication",
         action_type="delete",
         coordinates=instance.coordinates,
+        color=user.random_color,
     )

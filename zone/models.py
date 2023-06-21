@@ -84,6 +84,7 @@ def send_chatroom_to_websocket(sender, instance, created, **kwargs):
         type="chatroom",
         action_type=action_type,
         coordinates=instance.coordinates,
+        color=user.random_color,
     )
 
 
@@ -107,6 +108,7 @@ def send_chatroom_deleted_to_websocket(sender, instance, **kwargs):
         type="chatroom",
         action_type="delete",
         coordinates=instance.coordinates,
+        color=user.random_color,
     )
 
 
@@ -123,4 +125,5 @@ def send_chatroom_message_to_websocket(sender, instance, **kwargs):
         type="chatroom_msg",
         action_type="post",
         coordinates=instance.coordinates,
+        color=user.random_color,
     )

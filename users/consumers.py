@@ -58,9 +58,10 @@ class ProxynetConsumer(WebsocketConsumer):
         # users = UserInRoom.objects.filter(room=self.room_name)
         sender_user_id = self.get_user_id()
         sender = User.objects.get(id=sender_user_id)
-        self.send_message(sender.userHash, text, coordinates, type, action_type)
+        color = sender.random_color
+        self.send_message(sender.userHash, text, coordinates, type, action_type, color)
 
-    def send_message(self, sender, text, coordinates, type, action_type):
+    def send_message(self, sender, text, coordinates, type, action_type, color):
         # Send message to a specific user
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
@@ -70,11 +71,12 @@ class ProxynetConsumer(WebsocketConsumer):
                 "sender": sender,
                 "data": text,
                 "coordinates": coordinates,
+                "color": color,
             },
         )
 
     def custom_send_message(
-        self, room_name, sender, text, coordinates, type, action_type
+        self, room_name, sender, text, coordinates, type, action_type, color
     ):
         room_group_name = "chat_%s" % room_name
         if not hasattr(self, "channel_layer"):
@@ -89,6 +91,7 @@ class ProxynetConsumer(WebsocketConsumer):
                 "sender": sender,
                 "data": text,
                 "coordinates": coordinates,
+                "color": color,
             },
         )
 
@@ -116,6 +119,7 @@ class ProxynetConsumer(WebsocketConsumer):
         coordinates = event["coordinates"]
         type = event["type"]
         action_type = event["action_type"]
+        color = event["color"]
 
         listener_user_id = self.get_user_id()
         listener_user = User.objects.get(id=listener_user_id)
@@ -136,6 +140,7 @@ class ProxynetConsumer(WebsocketConsumer):
                     "data": text,
                     "type": type,
                     "action_type": action_type,
+                    "color": color,
                 }
             )
         )
